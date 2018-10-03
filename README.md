@@ -6,7 +6,7 @@ Individual Monopoly Project form Comp 320
 ## License
 
 
-Copyright [yyyy] [Caner Korkmaz]
+Copyright [2018] [Caner Korkmaz]
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this repository except in compliance with the License.
