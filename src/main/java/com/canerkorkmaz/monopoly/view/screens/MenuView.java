@@ -1,12 +1,12 @@
 package com.canerkorkmaz.monopoly.view.screens;
 
 import com.canerkorkmaz.monopoly.constants.Colors;
-import com.canerkorkmaz.monopoly.di.LoggerFactory;
+import com.canerkorkmaz.monopoly.di.DI;
+import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 import com.canerkorkmaz.monopoly.view.components.JCenteredPanel;
 import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.navigation.NavigationView;
-import jdk.nashorn.internal.scripts.JO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +20,7 @@ public class MenuView extends NavigationView implements ActionListener {
     private final static String JOIN_COMMAND = "MENU/JOIN";
     private final static String EXIT_COMMAND = "MENU/EXIT";
 
-    private Logger logger = new LoggerFactory().createLogger(MenuView.class);
+    private Logger logger = DI.get(ILoggerFactory.class).createLogger(MenuView.class);
 
     private JCenteredPanel root;
 
@@ -69,7 +69,7 @@ public class MenuView extends NavigationView implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
-        if(command == null) {
+        if (command == null) {
             return;
         }
         logger.i(String.format("Clicked %s button", command));

@@ -1,7 +1,8 @@
 package com.canerkorkmaz.monopoly.view.screens;
 
 import com.canerkorkmaz.monopoly.constants.Colors;
-import com.canerkorkmaz.monopoly.di.LoggerFactory;
+import com.canerkorkmaz.monopoly.di.DI;
+import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 import com.canerkorkmaz.monopoly.util.TimerUtils;
 import com.canerkorkmaz.monopoly.view.components.JCenteredPanel;
@@ -9,10 +10,9 @@ import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.navigation.NavigationView;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class SplashView extends NavigationView {
-    private Logger logger = new LoggerFactory().createLogger(SplashView.class);
+    private Logger logger = DI.get(ILoggerFactory.class).createLogger(SplashView.class);
 
     private JCenteredPanel root = new JCenteredPanel();
 

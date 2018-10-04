@@ -13,6 +13,7 @@ public final class ViewUtils {
 
     /**
      * Creates a JFrame fullscreen window from given view
+     *
      * @param view View to create window from
      * @return Created window
      */
@@ -22,7 +23,8 @@ public final class ViewUtils {
 
     /**
      * Creates a JFrame fullscreen window from given view
-     * @param view View to create window from
+     *
+     * @param view  View to create window from
      * @param title Title of the window
      * @return Created window
      */
@@ -38,13 +40,13 @@ public final class ViewUtils {
     }
 
     public static JFrame createWindowFromView(WindowAwareView view) {
-        JFrame window = createWindowFromView((IView)view);
+        JFrame window = createWindowFromView((IView) view);
         view.registerWindow(window);
         return window;
     }
 
     public static JFrame createWindowFromView(WindowAwareView view, String title) {
-        JFrame window = createWindowFromView((IView)view, title);
+        JFrame window = createWindowFromView((IView) view, title);
         view.registerWindow(window);
         return window;
     }

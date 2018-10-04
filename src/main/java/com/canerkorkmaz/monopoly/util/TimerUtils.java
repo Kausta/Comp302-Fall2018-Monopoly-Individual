@@ -1,7 +1,6 @@
 package com.canerkorkmaz.monopoly.util;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
@@ -14,8 +13,9 @@ public abstract class TimerUtils {
 
     /**
      * Runs the given listener just once after the delay, immediately starts
+     *
      * @param delayInMs Delay to run listener after that many milliseconds passed
-     * @param listener Listener to run
+     * @param listener  Listener to run
      * @return The created timer
      */
     public static Timer runDelayedOnce(int delayInMs, ActionListener listener) {

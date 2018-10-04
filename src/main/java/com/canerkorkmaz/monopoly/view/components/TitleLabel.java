@@ -11,7 +11,7 @@ public class TitleLabel extends JLabel {
     public TitleLabel(String text, boolean italic) {
         super(text);
         int fontType = Font.BOLD;
-        if(italic) {
+        if (italic) {
             fontType |= Font.ITALIC;
         }
         this.setFont(new Font("Monospaced", fontType, 50));

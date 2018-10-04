@@ -10,9 +10,11 @@ import javax.swing.*;
 public abstract class NavigationView implements IView {
     private NavigationContainer navigator;
 
-    public void onEnter() { }
+    public void onEnter() {
+    }
 
-    public void onExit() { }
+    public void onExit() {
+    }
 
     public NavigationContainer getNavigator() {
         return navigator;

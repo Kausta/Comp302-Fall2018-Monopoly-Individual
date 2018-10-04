@@ -8,6 +8,7 @@ import javax.swing.*;
 public interface IView {
     /**
      * Get root component of the view to register into a JFrame
+     *
      * @return Root Component
      */
     JComponent getRoot();

@@ -1,6 +1,7 @@
 package com.canerkorkmaz.monopoly.view.navigation;
 
-import com.canerkorkmaz.monopoly.di.LoggerFactory;
+import com.canerkorkmaz.monopoly.di.DI;
+import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 import com.canerkorkmaz.monopoly.view.base.WindowAwareView;
 
@@ -10,11 +11,11 @@ import java.util.Stack;
 
 /**
  * A Stack based Navigation Container that handles application wide container navigation inside a single JFrame
- *
+ * <p>
  * Works based on pushing/popping to the stack or replacing the entire stack
  */
 public class NavigationContainer extends WindowAwareView {
-    private Logger logger = new LoggerFactory().createLogger(NavigationContainer.class);
+    private Logger logger = DI.get(ILoggerFactory.class).createLogger(NavigationContainer.class);
 
     private Stack<NavigationView> navigationStack = new Stack<>();
     private JFrame window = new JFrame();

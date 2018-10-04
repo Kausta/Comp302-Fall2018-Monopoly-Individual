@@ -23,10 +23,11 @@ public class JCenteredPanel extends JPanel {
 
     /**
      * Sets the content pane and centers it
+     *
      * @param contentPane Actual content to center
      */
     public void setContentPane(JComponent contentPane) {
-        if(this.rootComponent != null) {
+        if (this.rootComponent != null) {
             this.remove(this.rootComponent);
         }
 

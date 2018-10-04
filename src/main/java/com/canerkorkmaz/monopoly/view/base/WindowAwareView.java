@@ -9,6 +9,7 @@ import java.awt.event.WindowAdapter;
 public abstract class WindowAwareView extends WindowAdapter implements IView {
     /**
      * Registers window to the window aware view
+     *
      * @param frame The JFrame window the view is in
      */
     public abstract void registerWindow(JFrame frame);

@@ -18,13 +18,15 @@ public abstract class Logger {
 
     /**
      * Method used to write log messages
-     * @param level Level string
+     *
+     * @param level   Level string
      * @param message Message Text
      */
     protected abstract void write(String level, String message);
 
     /**
      * Debug level log message
+     *
      * @param msg Message to log
      */
     public void d(String msg) {
@@ -35,6 +37,7 @@ public abstract class Logger {
 
     /**
      * Info level log message
+     *
      * @param msg Message to log
      */
     public void i(String msg) {
@@ -45,6 +48,7 @@ public abstract class Logger {
 
     /**
      * Warning level log message
+     *
      * @param msg Message to log
      */
     public void w(String msg) {
@@ -55,6 +59,7 @@ public abstract class Logger {
 
     /**
      * Error level log message
+     *
      * @param msg Message to log
      */
     public void e(String msg) {
