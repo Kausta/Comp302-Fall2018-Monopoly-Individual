@@ -37,7 +37,6 @@ public class CreateGameView extends CenteredNavigationView {
                 .setBackgroundColor(Colors.BACKGROUND_COLOR)
                 .addComponent(new TitleLabel("Create a New Game", false))
                 .addVerticalSpace(30)
-                // TODO: JFormatted Text Field & Validation
                 .addLabeledComponent("Game Port Number: ", portField)
                 .addVerticalSpace(15)
                 .addLabeledComponent("Local Player Count: ", playerCountField)

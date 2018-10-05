@@ -35,7 +35,6 @@ public class JoinGameView extends CenteredNavigationView {
                 .setBackgroundColor(Colors.BACKGROUND_COLOR)
                 .addComponent(new TitleLabel("Join a Game", false))
                 .addVerticalSpace(30)
-                // TODO: JFormatted Text Field & Validation
                 .addLabeledComponent("Game Ip Address: ", ipField)
                 .addVerticalSpace(15)
                 .addLabeledComponent("Game Port Number: ", portField)

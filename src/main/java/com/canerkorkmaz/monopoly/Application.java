@@ -15,10 +15,12 @@ import javax.swing.*;
  * Main entry point of the application
  */
 public class Application implements Runnable {
-    private Logger logger = DI.get(ILoggerFactory.class).createLogger(Application.class);
+    private final Logger logger;
 
     @Injected
-    public Application() {
+    public Application(ILoggerFactory loggerFactory) {
+        this.logger = loggerFactory.createLogger(Application.class);
+
         logger.i("Created new Monopoly Application");
     }
 

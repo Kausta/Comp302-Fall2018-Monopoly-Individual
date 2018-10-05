@@ -29,6 +29,7 @@ public class UserNamesView extends CenteredNavigationView {
         super.onEnter();
 
         final int playerCount = viewModel.getPlayerCount();
+        logger.d("Initializing user names view for " + playerCount + " players");
         nameFields = new JTextField[playerCount];
 
         final Form.Builder formBuilder = new Form.Builder()
@@ -54,9 +55,9 @@ public class UserNamesView extends CenteredNavigationView {
 
     private void validateNamesAndTriggerVM() {
         String[] names = new String[nameFields.length];
-        for(int i = 0;i < nameFields.length;i++){
+        for (int i = 0; i < nameFields.length; i++) {
             String text = nameFields[i].getText();
-            if(text == null || (text = text.trim()).equals("")) {
+            if (text == null || (text = text.trim()).equals("")) {
                 JOptionPane.showMessageDialog(null, "You cannot leave a name empty");
                 return;
             }
