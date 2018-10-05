@@ -4,10 +4,10 @@ import com.canerkorkmaz.monopoly.constants.LogLevel;
 import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 
-public class LoggerFactory implements ILoggerFactory {
+public class DefaultLoggerFactory implements ILoggerFactory {
     private LogLevel logLevel = LogLevel.DEBUG;
 
-    public LoggerFactory() {
+    public DefaultLoggerFactory() {
 
     }
 
@@ -15,7 +15,7 @@ public class LoggerFactory implements ILoggerFactory {
         return logLevel;
     }
 
-    public LoggerFactory setLogLevel(LogLevel logLevel) {
+    public DefaultLoggerFactory setLogLevel(LogLevel logLevel) {
         this.logLevel = logLevel;
         return this;
     }

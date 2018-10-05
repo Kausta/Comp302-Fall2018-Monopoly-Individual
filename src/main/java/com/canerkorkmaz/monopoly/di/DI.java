@@ -1,6 +1,6 @@
 package com.canerkorkmaz.monopoly.di;
 
-import com.canerkorkmaz.monopoly.di.impl.LoggerFactory;
+import com.canerkorkmaz.monopoly.di.impl.DefaultLoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 
 import java.lang.reflect.Constructor;
@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Optional;
 
 public final class DI {
-    private static DI instance = null;
-    private Logger logger = new LoggerFactory().createLogger(DI.class);
+    private static volatile DI instance = null;
+    private Logger logger = new DefaultLoggerFactory().createLogger(DI.class);
     private HashMap<String, Class<?>> registry = new HashMap<>();
     private HashMap<String, Optional<?>> singletons = new HashMap<>();
 
@@ -58,7 +58,7 @@ public final class DI {
                 actualClazz.getSimpleName()));
     }
 
-    public void setLogger(LoggerFactory factory) {
+    public void setLogger(DefaultLoggerFactory factory) {
         this.logger = factory.createLogger(DI.class);
     }
 

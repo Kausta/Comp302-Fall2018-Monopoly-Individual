@@ -1,19 +1,25 @@
 package com.canerkorkmaz.monopoly.view.navigation;
 
-import com.canerkorkmaz.monopoly.view.base.IView;
+import com.canerkorkmaz.monopoly.view.base.BaseView;
 
 import javax.swing.*;
 
 /**
  * View that can be registered in a NavigationContainer
  */
-public abstract class NavigationView implements IView {
+public abstract class NavigationView extends BaseView {
     private NavigationContainer navigator;
 
     public void onEnter() {
     }
 
     public void onExit() {
+    }
+
+    public void navigateIn() {
+    }
+
+    public void navigateOut() {
     }
 
     public NavigationContainer getNavigator() {

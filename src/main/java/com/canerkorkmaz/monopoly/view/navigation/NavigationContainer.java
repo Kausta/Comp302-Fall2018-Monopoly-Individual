@@ -29,11 +29,17 @@ public class NavigationContainer extends WindowAwareView {
     }
 
     public <T extends NavigationView> T navigatePush(Class<? extends T> clazz) {
+        NavigationView previous = getCurrentView();
+        if (previous != null) {
+            previous.navigateOut();
+        }
+
         T view = DI.get(clazz);
         NavigationView current = this.navigationStack.push(view);
         current.setNavigator(this);
         current.onEnter();
         logger.i(String.format("Entering %s", current.getClass().getSimpleName()));
+        current.navigateIn();
 
         this.redraw(current.getRoot());
 
@@ -46,6 +52,7 @@ public class NavigationContainer extends WindowAwareView {
             return false;
         }
         boolean successful = navigatePopUnchecked() != null;
+        getCurrentView().navigateIn();
         this.redraw(getCurrentView().getRoot());
         return successful;
     }
@@ -102,6 +109,7 @@ public class NavigationContainer extends WindowAwareView {
         assert !navigationStack.isEmpty();
         NavigationView previous = this.getCurrentView();
         logger.i(String.format("Exiting %s", previous.getClass().getSimpleName()));
+        previous.navigateOut();
         previous.onExit();
         return navigationStack.pop();
     }
