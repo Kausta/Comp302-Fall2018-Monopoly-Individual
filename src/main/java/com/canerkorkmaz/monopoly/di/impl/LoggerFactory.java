@@ -8,7 +8,7 @@ public class LoggerFactory implements ILoggerFactory {
     private LogLevel logLevel = LogLevel.DEBUG;
 
     public LoggerFactory() {
-        
+
     }
 
     public LogLevel getLogLevel() {

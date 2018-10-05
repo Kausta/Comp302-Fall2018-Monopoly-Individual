@@ -1,11 +1,15 @@
 package com.canerkorkmaz.monopoly.di;
 
+import com.canerkorkmaz.monopoly.di.impl.LoggerFactory;
+import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Optional;
 
 public final class DI {
     private static DI instance = null;
+    private Logger logger = new LoggerFactory().createLogger(DI.class);
     private HashMap<String, Class<?>> registry = new HashMap<>();
     private HashMap<String, Optional<?>> singletons = new HashMap<>();
 
@@ -37,6 +41,9 @@ public final class DI {
 
     public <T> void register(Class<T> clazz, Class<? extends T> actualClazz) {
         this.registry.put(clazz.getName(), actualClazz);
+        logger.i(String.format("Registered %s to dependency injection with factory %s",
+                clazz.getSimpleName(),
+                actualClazz.getSimpleName()));
     }
 
     public <T> void registerSingleton(Class<T> clazz) {
@@ -46,6 +53,13 @@ public final class DI {
     public <T> void registerSingleton(Class<T> clazz, Class<? extends T> actualClazz) {
         this.registry.put(clazz.getName(), actualClazz);
         this.singletons.put(clazz.getName(), Optional.empty());
+        logger.d(String.format("Registered %s to dependency injection with singleton %s",
+                clazz.getSimpleName(),
+                actualClazz.getSimpleName()));
+    }
+
+    public void setLogger(LoggerFactory factory) {
+        this.logger = factory.createLogger(DI.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -53,12 +67,15 @@ public final class DI {
         final Class<T> clazz = getClassFromRegistry(clazzName);
         final String name = clazzName.getName();
         if (singletons.containsKey(name)) {
+            logger.d(String.format("Injecting singleton %s with %s", clazzName.getSimpleName(), clazz.getSimpleName()));
             return ((Optional<T>) singletons.get(name)).orElseGet(() -> {
+                logger.d(String.format("Creating singleton %s with %s", clazzName.getSimpleName(), clazz.getSimpleName()));
                 T instance = instantiateImpl(clazz);
                 singletons.put(name, Optional.of(instance));
                 return instance;
             });
         }
+        logger.d(String.format("Creating %s with %s", clazzName.getSimpleName(), clazz.getSimpleName()));
         return instantiateImpl(clazz);
     }
 

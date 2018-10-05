@@ -20,25 +20,24 @@ public class NavigationContainer extends WindowAwareView {
     private Stack<NavigationView> navigationStack = new Stack<>();
     private JFrame window = new JFrame();
 
-    public NavigationContainer(NavigationView initialView) {
-        this.navigatePush(initialView);
+    public NavigationContainer(Class<? extends NavigationView> initialViewClazz) {
+        this.navigatePush(initialViewClazz);
     }
 
     public NavigationView getCurrentView() {
         return this.navigationStack.isEmpty() ? null : this.navigationStack.peek();
     }
 
-    public void navigatePush(NavigationView view) {
+    public <T extends NavigationView> T navigatePush(Class<? extends T> clazz) {
+        T view = DI.get(clazz);
         NavigationView current = this.navigationStack.push(view);
         current.setNavigator(this);
         current.onEnter();
         logger.i(String.format("Entering %s", current.getClass().getSimpleName()));
 
-        if (window == null) {
-            return;
-        }
-        window.setContentPane(current.getRoot());
-        this.redraw();
+        this.redraw(current.getRoot());
+
+        return view;
     }
 
     public boolean navigatePop() {
@@ -46,15 +45,17 @@ public class NavigationContainer extends WindowAwareView {
         if (this.navigationStack.size() <= 1) {
             return false;
         }
-        return navigatePopUnchecked() != null;
+        boolean successful = navigatePopUnchecked() != null;
+        this.redraw(getCurrentView().getRoot());
+        return successful;
     }
 
-    public void navigateReplace(NavigationView to) {
+    public <T extends NavigationView> T navigateReplace(Class<? extends T> clazz) {
         while (!navigationStack.isEmpty()) {
             this.navigatePopUnchecked();
         }
 
-        this.navigatePush(to);
+        return this.navigatePush(clazz);
     }
 
     public void exitApplication() {
@@ -69,12 +70,18 @@ public class NavigationContainer extends WindowAwareView {
     }
 
     public void redraw() {
-        JFrame window = this.getWindow();
-        if (window == null) {
-            return;
+        if (window != null) {
+            window.validate();
+            window.repaint();
         }
-        window.validate();
-        window.repaint();
+    }
+
+    public void redraw(JComponent contentPane) {
+        if (window != null) {
+            window.setContentPane(contentPane);
+            window.validate();
+            window.repaint();
+        }
     }
 
     @Override

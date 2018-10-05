@@ -3,7 +3,6 @@ package com.canerkorkmaz.monopoly;
 import com.canerkorkmaz.monopoly.di.DI;
 import com.canerkorkmaz.monopoly.di.DIRegistry;
 import com.canerkorkmaz.monopoly.di.Injected;
-import com.canerkorkmaz.monopoly.di.impl.LoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
 import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 import com.canerkorkmaz.monopoly.util.ViewUtils;
@@ -34,8 +33,9 @@ public class Application implements Runnable {
     @Override
     public void run() {
         logger.i("Running Monopoly Application");
+        ViewUtils.setSystemLookAndFeel();
 
-        NavigationContainer navView = new NavigationContainer(new SplashView());
+        NavigationContainer navView = new NavigationContainer(SplashView.class);
         ViewUtils.createWindowFromView(navView);
     }
 }

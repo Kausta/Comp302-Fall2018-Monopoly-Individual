@@ -33,6 +33,7 @@ public final class ViewUtils {
         // Register view
         frame.setContentPane(view.getRoot());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
         // Set fullscreen
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
@@ -43,6 +44,14 @@ public final class ViewUtils {
         JFrame window = createWindowFromView((IView) view);
         view.registerWindow(window);
         return window;
+    }
+
+    public static void setSystemLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {
+
+        }
     }
 
     public static JFrame createWindowFromView(WindowAwareView view, String title) {
