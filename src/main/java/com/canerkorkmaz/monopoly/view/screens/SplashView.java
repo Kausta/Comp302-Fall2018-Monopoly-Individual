@@ -1,9 +1,9 @@
 package com.canerkorkmaz.monopoly.view.screens;
 
-import com.canerkorkmaz.monopoly.di.DI;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
-import com.canerkorkmaz.monopoly.util.TimerUtils;
+import com.canerkorkmaz.monopoly.lib.di.DI;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
+import com.canerkorkmaz.monopoly.lib.util.TimerUtils;
 import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.navigation.CenteredNavigationView;
 

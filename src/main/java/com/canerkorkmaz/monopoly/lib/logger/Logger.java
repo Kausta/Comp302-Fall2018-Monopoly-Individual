@@ -1,4 +1,4 @@
-package com.canerkorkmaz.monopoly.di.interfaces;
+package com.canerkorkmaz.monopoly.lib.logger;
 
 import com.canerkorkmaz.monopoly.constants.LogLevel;
 

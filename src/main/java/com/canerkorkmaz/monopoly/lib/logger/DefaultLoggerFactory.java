@@ -1,8 +1,6 @@
-package com.canerkorkmaz.monopoly.di.impl;
+package com.canerkorkmaz.monopoly.lib.logger;
 
 import com.canerkorkmaz.monopoly.constants.LogLevel;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 
 public class DefaultLoggerFactory implements ILoggerFactory {
     private LogLevel logLevel = LogLevel.DEBUG;

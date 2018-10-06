@@ -1,11 +1,11 @@
-package com.canerkorkmaz.monopoly.di;
+package com.canerkorkmaz.monopoly.lib.di;
 
 import com.canerkorkmaz.monopoly.data.GameConfiguration;
-import com.canerkorkmaz.monopoly.di.impl.DefaultLoggerFactory;
-import com.canerkorkmaz.monopoly.di.impl.SwingThreadScheduler;
-import com.canerkorkmaz.monopoly.di.impl.ViewModelThreadScheduler;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.IThreadScheduler;
+import com.canerkorkmaz.monopoly.lib.logger.DefaultLoggerFactory;
+import com.canerkorkmaz.monopoly.lib.threading.SwingThreadScheduler;
+import com.canerkorkmaz.monopoly.lib.threading.ViewModelThreadScheduler;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.threading.IThreadScheduler;
 
 public class DIRegistry {
     public DIRegistry() {

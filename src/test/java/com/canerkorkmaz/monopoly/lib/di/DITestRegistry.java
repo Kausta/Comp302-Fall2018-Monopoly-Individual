@@ -1,6 +1,6 @@
-package com.canerkorkmaz.monopoly.di;
+package com.canerkorkmaz.monopoly.lib.di;
 
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 
 public class DITestRegistry {
     public DITestRegistry() {

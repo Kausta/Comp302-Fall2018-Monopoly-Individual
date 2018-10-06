@@ -1,7 +1,7 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
 import com.canerkorkmaz.monopoly.data.GameConfiguration;
-import com.canerkorkmaz.monopoly.di.Injected;
+import com.canerkorkmaz.monopoly.lib.di.Injected;
 
 public class LobbyViewModel {
     private GameConfiguration configuration;

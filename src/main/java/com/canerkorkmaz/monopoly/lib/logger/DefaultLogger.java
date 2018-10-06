@@ -1,7 +1,6 @@
-package com.canerkorkmaz.monopoly.di.impl;
+package com.canerkorkmaz.monopoly.lib.logger;
 
 import com.canerkorkmaz.monopoly.constants.LogLevel;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
 
 import java.time.Instant;
 

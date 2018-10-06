@@ -1,9 +1,9 @@
 package com.canerkorkmaz.monopoly.view.screens;
 
 import com.canerkorkmaz.monopoly.constants.Colors;
-import com.canerkorkmaz.monopoly.di.Injected;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+import com.canerkorkmaz.monopoly.lib.di.Injected;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.view.components.Form;
 import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.data.UINameData;

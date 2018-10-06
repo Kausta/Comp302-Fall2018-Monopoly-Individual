@@ -1,8 +1,8 @@
 package com.canerkorkmaz.monopoly.view.navigation;
 
-import com.canerkorkmaz.monopoly.di.DI;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+import com.canerkorkmaz.monopoly.lib.di.DI;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.view.base.WindowAwareView;
 
 import javax.swing.*;

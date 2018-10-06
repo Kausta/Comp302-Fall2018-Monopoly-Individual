@@ -1,4 +1,4 @@
-package com.canerkorkmaz.monopoly.util;
+package com.canerkorkmaz.monopoly.lib.util;
 
 import com.canerkorkmaz.monopoly.view.base.IView;
 import com.canerkorkmaz.monopoly.view.base.WindowAwareView;

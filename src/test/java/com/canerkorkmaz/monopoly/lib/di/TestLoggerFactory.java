@@ -1,7 +1,7 @@
-package com.canerkorkmaz.monopoly.di;
+package com.canerkorkmaz.monopoly.lib.di;
 
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
 public class TestLoggerFactory implements ILoggerFactory {
     @Override

@@ -1,4 +1,4 @@
-package com.canerkorkmaz.monopoly.di;
+package com.canerkorkmaz.monopoly.lib.di;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

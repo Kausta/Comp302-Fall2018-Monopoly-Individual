@@ -1,7 +1,7 @@
-package com.canerkorkmaz.monopoly.di;
+package com.canerkorkmaz.monopoly.lib.di;
 
-import com.canerkorkmaz.monopoly.di.impl.DefaultLoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+import com.canerkorkmaz.monopoly.lib.logger.DefaultLoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;

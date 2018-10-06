@@ -1,4 +1,4 @@
-package com.canerkorkmaz.monopoly.lib;
+package com.canerkorkmaz.monopoly.lib.threading;
 
 import java.util.concurrent.ThreadFactory;
 

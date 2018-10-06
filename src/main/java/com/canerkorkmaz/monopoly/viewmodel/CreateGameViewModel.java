@@ -1,9 +1,9 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
 import com.canerkorkmaz.monopoly.data.GameConfiguration;
-import com.canerkorkmaz.monopoly.di.Injected;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+import com.canerkorkmaz.monopoly.lib.di.Injected;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.event.Event;
 import com.canerkorkmaz.monopoly.lib.event.UIEvent;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;

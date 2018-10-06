@@ -1,4 +1,4 @@
-package com.canerkorkmaz.monopoly.util;
+package com.canerkorkmaz.monopoly.lib.util;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;

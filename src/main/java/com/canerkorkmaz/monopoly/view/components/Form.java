@@ -1,9 +1,9 @@
 package com.canerkorkmaz.monopoly.view.components;
 
-import com.canerkorkmaz.monopoly.di.DI;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
-import com.canerkorkmaz.monopoly.util.GridBagConstraintsBuilder;
+import com.canerkorkmaz.monopoly.lib.di.DI;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
+import com.canerkorkmaz.monopoly.lib.util.GridBagConstraintsBuilder;
 
 import javax.swing.*;
 import java.awt.*;

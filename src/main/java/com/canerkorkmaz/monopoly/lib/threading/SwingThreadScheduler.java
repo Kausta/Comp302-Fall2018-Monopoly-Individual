@@ -1,6 +1,4 @@
-package com.canerkorkmaz.monopoly.di.impl;
-
-import com.canerkorkmaz.monopoly.di.interfaces.IThreadScheduler;
+package com.canerkorkmaz.monopoly.lib.threading;
 
 import javax.swing.*;
 

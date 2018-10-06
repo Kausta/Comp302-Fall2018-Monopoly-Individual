@@ -1,8 +1,8 @@
 package com.canerkorkmaz.monopoly.data;
 
-import com.canerkorkmaz.monopoly.di.Injected;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
+import com.canerkorkmaz.monopoly.lib.di.Injected;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
 // TODO: Repository and use case between data configuration and view models
 public class GameConfiguration {

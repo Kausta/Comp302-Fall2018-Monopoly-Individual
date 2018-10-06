@@ -1,11 +1,11 @@
 package com.canerkorkmaz.monopoly;
 
-import com.canerkorkmaz.monopoly.di.DI;
-import com.canerkorkmaz.monopoly.di.DIRegistry;
-import com.canerkorkmaz.monopoly.di.Injected;
-import com.canerkorkmaz.monopoly.di.interfaces.ILoggerFactory;
-import com.canerkorkmaz.monopoly.di.interfaces.Logger;
-import com.canerkorkmaz.monopoly.util.ViewUtils;
+import com.canerkorkmaz.monopoly.lib.di.DI;
+import com.canerkorkmaz.monopoly.lib.di.DIRegistry;
+import com.canerkorkmaz.monopoly.lib.di.Injected;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
+import com.canerkorkmaz.monopoly.lib.util.ViewUtils;
 import com.canerkorkmaz.monopoly.view.navigation.NavigationContainer;
 import com.canerkorkmaz.monopoly.view.screens.SplashView;
 
