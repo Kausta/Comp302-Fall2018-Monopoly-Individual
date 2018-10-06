@@ -18,7 +18,6 @@ public class CreateGameView extends CenteredNavigationView {
     private CreateGameViewModel viewModel;
 
     private JTextField portField;
-    private JComboBox<Integer> playerCountField;
 
     @Injected
     public CreateGameView(ILoggerFactory loggerFactory, CreateGameViewModel viewModel) {
@@ -31,15 +30,12 @@ public class CreateGameView extends CenteredNavigationView {
         super.onEnter();
 
         portField = new JTextField("3000");
-        playerCountField = new JComboBox<>(new Integer[]{1, 2, 3, 4});
 
         final Form form = new Form.Builder()
                 .setBackgroundColor(Colors.BACKGROUND_COLOR)
                 .addComponent(new TitleLabel("Create a New Game", false))
                 .addVerticalSpace(30)
-                .addLabeledComponent("Game Port Number: ", portField)
-                .addVerticalSpace(15)
-                .addLabeledComponent("Local Player Count: ", playerCountField)
+                .addLabeledComponent("Your Port Number: ", portField)
                 .addVerticalSpace(15)
                 .addButton("CREATE THE GAME", this::validateAndTriggerVM)
                 .addVerticalSpace(15)
@@ -48,21 +44,18 @@ public class CreateGameView extends CenteredNavigationView {
 
         this.setContentPane(form.getContent());
 
-        this.viewModel.getSuccessfullyCreated().runIfNotHandled((unit) -> {
-            this.getNavigator().navigatePush(UserNamesView.class);
-        });
+        this.viewModel.getSuccessfullyCreated().runIfNotHandled((unit) -> this.getNavigator().navigatePush(LobbyView.class));
     }
 
     private void validateAndTriggerVM() {
         try {
             int port = Validate.getValidatedPort(portField.getText());
-            int localPlayerCount = Validate.getValidatedLocalPlayers(playerCountField.getSelectedItem());
 
             viewModel.getOnCreateGameClick()
-                    .trigger(new UIGameCreationData(port, localPlayerCount));
+                    .trigger(new UIGameCreationData(port));
         } catch (Exception e) {
             logger.e(e.getMessage());
-            JOptionPane.showMessageDialog(null, "Error occured: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error occurred: " + e.getMessage());
         }
     }
 }

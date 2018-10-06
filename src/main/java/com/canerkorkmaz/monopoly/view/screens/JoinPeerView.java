@@ -9,20 +9,20 @@ import com.canerkorkmaz.monopoly.view.components.Form;
 import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.data.UIGameJoinData;
 import com.canerkorkmaz.monopoly.view.navigation.CenteredNavigationView;
-import com.canerkorkmaz.monopoly.viewmodel.JoinGameViewModel;
+import com.canerkorkmaz.monopoly.viewmodel.JoinPeerViewModel;
 
 import javax.swing.*;
 
-public class JoinGameView extends CenteredNavigationView {
+public class JoinPeerView extends CenteredNavigationView {
     private final Logger logger;
-    private final JoinGameViewModel viewModel;
+    private final JoinPeerViewModel viewModel;
 
     private JTextField ipField = new JTextField("127.0.0.1");
-    private JTextField portField = new JTextField("3000");
-    private JComboBox<Integer> playerCountField = new JComboBox<>(new Integer[]{1, 2, 3, 4});
+    private JTextField peerPortField = new JTextField("3000");
+    private JTextField portField = new JTextField("");
 
     @Injected
-    public JoinGameView(ILoggerFactory loggerFactory, JoinGameViewModel viewModel) {
+    public JoinPeerView(ILoggerFactory loggerFactory, JoinPeerViewModel viewModel) {
         this.logger = loggerFactory.createLogger(CreateGameView.class);
         this.viewModel = viewModel;
     }
@@ -33,20 +33,20 @@ public class JoinGameView extends CenteredNavigationView {
 
         final Form form = new Form.Builder()
                 .setBackgroundColor(Colors.BACKGROUND_COLOR)
-                .addComponent(new TitleLabel("Join a Game", false))
+                .addComponent(new TitleLabel("Join Peer", false))
                 .addVerticalSpace(30)
-                .addLabeledComponent("Game Ip Address: ", ipField)
+                .addLabeledComponent("Peer Ip: ", ipField)
                 .addVerticalSpace(15)
-                .addLabeledComponent("Game Port Number: ", portField)
+                .addLabeledComponent("Peer Port: ", peerPortField)
                 .addVerticalSpace(15)
-                .addLabeledComponent("Local Player Count: ", playerCountField)
+                .addLabeledComponent("Your Port: ", portField)
                 .addVerticalSpace(15)
                 .addButton("JOIN THE GAME", this::validateAndTriggerVM)
                 .addVerticalSpace(15)
                 .addButton("GO BACK", () -> this.getNavigator().navigatePop())
                 .build();
 
-        viewModel.getSuccessfullyCreated().runIfNotHandled((unit) -> this.getNavigator().navigatePush(UserNamesView.class));
+        viewModel.getSuccessfullyCreated().runIfNotHandled((unit) -> this.getNavigator().navigatePush(LobbyView.class));
 
         this.setContentPane(form.getContent());
     }
@@ -54,14 +54,14 @@ public class JoinGameView extends CenteredNavigationView {
     private void validateAndTriggerVM() {
         try {
             String ip = Validate.getValidatedIp(ipField.getText());
+            int peerPort = Validate.getValidatedPort(peerPortField.getText());
             int port = Validate.getValidatedPort(portField.getText());
-            int players = Validate.getValidatedLocalPlayers(playerCountField.getSelectedItem());
 
             viewModel.getOnCreateGameClick()
-                    .trigger(new UIGameJoinData(ip, port, players));
+                    .trigger(new UIGameJoinData(ip, peerPort, port));
         } catch (Exception e) {
             logger.e(e.getMessage());
-            JOptionPane.showMessageDialog(null, "Error occured: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error occurred: " + e.getMessage());
         }
     }
 }

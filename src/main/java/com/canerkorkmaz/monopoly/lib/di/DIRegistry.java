@@ -1,7 +1,9 @@
 package com.canerkorkmaz.monopoly.lib.di;
 
-import com.canerkorkmaz.monopoly.data.GameConfiguration;
+import com.canerkorkmaz.monopoly.data.model.LocalPlayerData;
+import com.canerkorkmaz.monopoly.domain.service.LocalPlayerRepository;
 import com.canerkorkmaz.monopoly.lib.logger.DefaultLoggerFactory;
+import com.canerkorkmaz.monopoly.lib.threading.SocketThreadScheduler;
 import com.canerkorkmaz.monopoly.lib.threading.SwingThreadScheduler;
 import com.canerkorkmaz.monopoly.lib.threading.ViewModelThreadScheduler;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
@@ -20,7 +22,10 @@ public class DIRegistry {
         registry.registerSingleton(IThreadScheduler.class, ViewModelThreadScheduler.class);
         registry.registerSingleton(ViewModelThreadScheduler.class, ViewModelThreadScheduler.class);
         registry.registerSingleton(SwingThreadScheduler.class, SwingThreadScheduler.class);
-
-        registry.registerSingleton(GameConfiguration.class, GameConfiguration.class);
+        registry.registerSingleton(SocketThreadScheduler.class, SocketThreadScheduler.class);
+        // Data Models
+        registry.registerSingleton(LocalPlayerData.class, LocalPlayerData.class);
+        // Services
+        registry.register(LocalPlayerRepository.class);
     }
 }

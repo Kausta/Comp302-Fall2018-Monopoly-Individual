@@ -38,15 +38,15 @@ public class LobbyView extends CenteredNavigationView {
         }
         formBuilder.addVerticalSpace(5);
 
-        if (viewModel.isServerMode()) {
+       // if (viewModel.isServerMode()) {
             formBuilder.addButton("START GAME", this::startGame);
-        } else {
+       /* } else {
             JLabel waitingText = new JLabel("WAITING FOR HOST ...");
             waitingText.setFont(new Font("monospaced", Font.BOLD, 24));
             waitingText.setAlignmentX(JLabel.CENTER_ALIGNMENT);
             formBuilder.addComponent(waitingText);
         }
-        final Form form = formBuilder
+       */ final Form form = formBuilder
                 .addVerticalSpace(15)
                 .addButton("GO BACK", () -> this.getNavigator().navigatePop())
                 .build();

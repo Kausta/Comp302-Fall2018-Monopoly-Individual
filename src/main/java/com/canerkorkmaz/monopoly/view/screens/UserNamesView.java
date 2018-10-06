@@ -2,8 +2,6 @@ package com.canerkorkmaz.monopoly.view.screens;
 
 import com.canerkorkmaz.monopoly.constants.Colors;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
-import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
-import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.view.components.Form;
 import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.data.UINameData;
@@ -13,14 +11,12 @@ import com.canerkorkmaz.monopoly.viewmodel.UserNamesViewModel;
 import javax.swing.*;
 
 public class UserNamesView extends CenteredNavigationView {
-    private Logger logger;
     private UserNamesViewModel viewModel;
 
     private JTextField[] nameFields;
 
     @Injected
-    public UserNamesView(ILoggerFactory loggerFactory, UserNamesViewModel viewModel) {
-        this.logger = loggerFactory.createLogger(UserNamesView.class);
+    public UserNamesView(UserNamesViewModel viewModel) {
         this.viewModel = viewModel;
     }
 
@@ -29,28 +25,33 @@ public class UserNamesView extends CenteredNavigationView {
         super.onEnter();
 
         final int playerCount = viewModel.getPlayerCount();
-        logger.d("Initializing user names view for " + playerCount + " players");
+        final String[] names = viewModel.getUserNames();
         nameFields = new JTextField[playerCount];
 
         final Form.Builder formBuilder = new Form.Builder()
                 .setBackgroundColor(Colors.BACKGROUND_COLOR)
-                .addComponent(new TitleLabel("Enter User Names", false))
+                .addComponent(new TitleLabel("Monopoly - Local Player Setup", false))
                 .addVerticalSpace(30);
         for (int i = 0; i < playerCount; i++) {
             nameFields[i] = new JTextField();
+            nameFields[i].setText(names[i]);
             formBuilder.addLabeledComponent("User " + (i + 1) + " name: ", nameFields[i])
                     .addVerticalSpace(15);
         }
         final Form form = formBuilder.addVerticalSpace(15)
                 .addButton("CONTINUE", this::validateNamesAndTriggerVM)
                 .addVerticalSpace(15)
-                .addButton("GO BACK", () -> this.getNavigator().navigatePop())
+                .addButton("GO BACK", () -> {
+                    // Also save names when going back for persistence, however don't validate
+                    this.triggerVMNoValidation();
+                    this.getNavigator().navigatePop();
+                })
                 .build();
 
         this.setContentPane(form.getContent());
 
         viewModel.getSuccessfullySetNames().runIfNotHandled((unit) ->
-                this.getNavigator().navigatePush(LobbyView.class));
+                this.getNavigator().navigatePush(MenuView.class));
     }
 
     private void validateNamesAndTriggerVM() {
@@ -64,5 +65,13 @@ public class UserNamesView extends CenteredNavigationView {
             names[i] = text;
         }
         viewModel.getOnContinueClick().trigger(new UINameData(names));
+    }
+
+    private void triggerVMNoValidation() {
+        String[] enteredNames = new String[nameFields.length];
+        for (int i = 0; i < nameFields.length; i++) {
+            enteredNames[i] = nameFields[i].getText();
+        }
+        viewModel.getOnBackClick().trigger(new UINameData(enteredNames));
     }
 }

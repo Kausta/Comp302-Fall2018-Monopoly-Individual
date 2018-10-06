@@ -1,6 +1,6 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
-import com.canerkorkmaz.monopoly.data.GameConfiguration;
+import com.canerkorkmaz.monopoly.domain.service.LocalPlayerRepository;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
@@ -13,19 +13,16 @@ public class CreateGameViewModel {
     private Logger logger;
     private UIEvent<Unit> successfullyCreated;
     private Event<UIGameCreationData> onCreateGameClick;
-    private GameConfiguration configuration;
 
     @Injected
     public CreateGameViewModel(ILoggerFactory loggerFactory,
                                UIEvent<Unit> successfullyCreated,
-                               Event<UIGameCreationData> onCreateGameClick,
-                               GameConfiguration configuration) {
+                               Event<UIGameCreationData> onCreateGameClick) {
         this.logger = loggerFactory.createLogger(CreateGameViewModel.class);
         this.successfullyCreated = successfullyCreated;
         this.onCreateGameClick = onCreateGameClick;
-        this.configuration = configuration;
 
-        onCreateGameClick.runIfNotHandled((data) -> createGame(data.getPort(), data.getNumLocalPlayers()));
+        onCreateGameClick.runIfNotHandled((data) -> createGame(data.getPort()));
     }
 
     public UIEvent<Unit> getSuccessfullyCreated() {
@@ -36,13 +33,9 @@ public class CreateGameViewModel {
         return onCreateGameClick;
     }
 
-    private void createGame(int port, int numLocalPlayers) {
-        logger.i(String.format("Starting on %s with %s local players",
-                port,
-                numLocalPlayers));
-        configuration.setServerMode(true);
-        configuration.setPort(port);
-        configuration.setNumLocalPlayers(numLocalPlayers);
+    private void createGame(int port) {
+        logger.i(String.format("Starting on %s",
+                port));
         successfullyCreated.trigger(Unit.INSTANCE);
     }
 }

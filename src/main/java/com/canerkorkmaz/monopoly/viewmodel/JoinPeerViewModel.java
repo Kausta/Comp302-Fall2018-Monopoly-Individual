@@ -1,6 +1,6 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
-import com.canerkorkmaz.monopoly.data.GameConfiguration;
+import com.canerkorkmaz.monopoly.domain.service.LocalPlayerRepository;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
@@ -9,23 +9,20 @@ import com.canerkorkmaz.monopoly.lib.event.UIEvent;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;
 import com.canerkorkmaz.monopoly.view.data.UIGameJoinData;
 
-public class JoinGameViewModel {
+public class JoinPeerViewModel {
     private Logger logger;
     private UIEvent<Unit> successfullyJoined;
     private Event<UIGameJoinData> onJoinGameClick;
-    private GameConfiguration configuration;
 
     @Injected
-    public JoinGameViewModel(ILoggerFactory loggerFactory,
+    public JoinPeerViewModel(ILoggerFactory loggerFactory,
                              UIEvent<Unit> successfullyCreated,
-                             Event<UIGameJoinData> onCreateGameClick,
-                             GameConfiguration configuration) {
-        this.logger = loggerFactory.createLogger(JoinGameViewModel.class);
+                             Event<UIGameJoinData> onCreateGameClick) {
+        this.logger = loggerFactory.createLogger(JoinPeerViewModel.class);
         this.successfullyJoined = successfullyCreated;
         this.onJoinGameClick = onCreateGameClick;
-        this.configuration = configuration;
 
-        onCreateGameClick.runIfNotHandled((data) -> joinGame(data.getIpAddress(), data.getPort(), data.getNumLocalPlayers()));
+        onCreateGameClick.runIfNotHandled((data) -> joinGame(data.getIpAddress(), data.getPeerPort(), data.getPort()));
     }
 
     public UIEvent<Unit> getSuccessfullyCreated() {
@@ -36,15 +33,11 @@ public class JoinGameViewModel {
         return onJoinGameClick;
     }
 
-    private void joinGame(String ip, int port, int numLocalPlayers) {
-        logger.i(String.format("Joining %s:%s with %s local players",
+    private void joinGame(String ip, int peerPort, int port) {
+        logger.i(String.format("Joining %s:%s, starting on %s",
                 ip,
-                port,
-                numLocalPlayers));
-        configuration.setServerMode(false);
-        configuration.setIp(ip);
-        configuration.setPort(port);
-        configuration.setNumLocalPlayers(numLocalPlayers);
+                peerPort,
+                port));
         successfullyJoined.trigger(Unit.INSTANCE);
     }
 }
