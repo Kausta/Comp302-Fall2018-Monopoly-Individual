@@ -4,8 +4,8 @@ Prepared by Caner Korkmaz (ckorkmaz16@ku.edu.tr, 60047)
 Individual Monopoly Project form Comp 320
 
 Details
-- P2P Distributed MVVM based Monopoly Game
-- There is an initial peer creating game, but the rest can join to any peer
+- Master-Client, MVVM based Monopoly Game
+- There is an initial peer creating game, and the rest join to that peer
 - Application is structured as an MVVM application
     - Views are Swing Views in package `com.canerkorkmaz.monopoly.view`
     - ViewModels (in`com.canerkorkmaz.monopoly.viewmodel`) communicate with views using custom made Events and UIEvents (events run in a different background thread, ui events run in swing thread)
