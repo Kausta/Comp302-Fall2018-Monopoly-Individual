@@ -1,6 +1,7 @@
 package com.canerkorkmaz.monopoly.lib.command;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class BaseCommand implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -16,6 +17,13 @@ public abstract class BaseCommand implements Serializable {
     }
 
     public boolean isCommand(String identifier) {
-        return this.identifier == identifier;
+        return Objects.equals(this.identifier, identifier);
+    }
+
+    @Override
+    public String toString() {
+        return "BaseCommand{" +
+                "identifier='" + identifier + '\'' +
+                '}';
     }
 }

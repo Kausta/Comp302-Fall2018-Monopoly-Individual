@@ -2,6 +2,8 @@ package com.canerkorkmaz.monopoly.lib.socket;
 
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
+import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
+import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.event.Event;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
@@ -17,11 +19,11 @@ public class MasterConnectionSocket extends BaseSocket {
     private ObjectOutputStream outputStream;
     private Socket socket;
 
-    public MasterConnectionSocket(ILoggerFactory loggerFactory, Socket socket, Event<BaseCommand> onReceiveCommand, Event<BaseCommand> sendCommand) {
-        super("Master-Connection", onReceiveCommand, sendCommand);
+    public MasterConnectionSocket(ILoggerFactory loggerFactory, Socket socket, CommandDispatcher dispatcher) {
+        super("Master-Connection", dispatcher);
         this.logger = loggerFactory.createLogger(MasterConnectionSocket.class);
         this.socket = socket;
-        sendCommand.subscribe(this::send);
+        dispatcher.subscribe(this::send);
     }
 
     @Override
@@ -40,15 +42,21 @@ public class MasterConnectionSocket extends BaseSocket {
     protected void onRun() {
         try {
             Object obj = inputStream.readObject();
-            if(!(obj instanceof BaseCommand)) {
+            if(obj == null) {
+                logger.i("Closing connection!");
+                getDispatcher().sendCommand((new ClosedCommand()));
+                return;
+            }
+            if(!(obj instanceof RemoteCommand)) {
                 throw new RuntimeException("Received incorrect object");
             }
-            logger.i("Received " + ((BaseCommand) obj).getIdentifier());
-            getOnReceiveCommand().trigger((BaseCommand)obj);
+            RemoteCommand remoteCommand = (RemoteCommand) obj;
+            logger.i("Received " + remoteCommand.toString());
+            getDispatcher().sendCommand(remoteCommand.getInnerCommand());
         } catch (Exception e) {
             logger.e("Received incorrect object: " + e.getMessage());
             if(e.getMessage().equalsIgnoreCase("Connection reset")) {
-                getOnReceiveCommand().trigger(new ClosedCommand());
+                getDispatcher().sendCommand((new ClosedCommand()));
                 return;
             }
         }
@@ -57,7 +65,14 @@ public class MasterConnectionSocket extends BaseSocket {
 
     private void send(BaseCommand command) {
         try {
-            logger.i("Sending " + command.getIdentifier());
+            if(command instanceof ClosedCommand) {
+                socket.close();
+                return;
+            }
+            if(!(command instanceof RemoteCommand)) {
+                return;
+            }
+            logger.i("Sending " + command.toString());
             outputStream.writeObject(command);
         } catch (IOException e) {
             logger.e("Cannot send object: " + e.getMessage());

@@ -34,7 +34,7 @@ public class UserNamesViewModel {
         String[] names = this.configuration.getLocalPlayerNames();
         for (int i = 0; i < names.length; i++) {
             if (names[i] == null) {
-                names[i] = "";
+                names[i] = "Player " + i;
             }
         }
         return names;

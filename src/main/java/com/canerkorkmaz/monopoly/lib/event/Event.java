@@ -22,8 +22,7 @@ public class Event<T> extends Observable {
     @SuppressWarnings("unchecked")
     public void subscribe(EventInterface<T> fn) {
         addObserver((o, arg) -> {
-           fn.handle((T) arg);
-            // scheduler.scheduleOnce(() -> fn.handle((T) arg));
+            scheduler.scheduleOnce(() -> fn.handle((T) arg));
         });
     }
 
@@ -32,7 +31,6 @@ public class Event<T> extends Observable {
         addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
-                // scheduler.scheduleOnce(() -> fn.handle((T) arg));
                 fn.handle((T) arg);
                 Event.this.deleteObserver(this);
             }

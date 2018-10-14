@@ -4,9 +4,9 @@ import com.canerkorkmaz.monopoly.domain.data.ClientData;
 import com.canerkorkmaz.monopoly.domain.service.ConnectionRepository;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
+import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
+import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
-import com.canerkorkmaz.monopoly.lib.event.Event;
-import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
@@ -23,11 +23,11 @@ public class FollowerSocket extends BaseSocket {
     private Socket socket = null;
 
     @Injected
-    public FollowerSocket(ILoggerFactory loggerFactory, ConnectionRepository repository, EventFactory factory) {
-        super("Client-BaseSocket", factory);
+    public FollowerSocket(ILoggerFactory loggerFactory, ConnectionRepository repository, CommandDispatcher dispatcher) {
+        super("Client-BaseSocket", dispatcher);
         this.logger = loggerFactory.createLogger(FollowerSocket.class);
         this.repository = repository;
-        getSendCommand().subscribe(this::send);
+        getDispatcher().subscribe(this::send);
     }
 
     @Override
@@ -56,18 +56,19 @@ public class FollowerSocket extends BaseSocket {
             Object obj = inputStream.readObject();
             if(obj == null) {
                 logger.i("Closing connection!");
-                getOnReceiveCommand().trigger(new ClosedCommand());
+                getDispatcher().sendCommand(new ClosedCommand());
                 return;
             }
-            if(!(obj instanceof BaseCommand)) {
+            if(!(obj instanceof RemoteCommand)) {
                 throw new RuntimeException("Received incorrect object");
             }
-            logger.i("Received " + ((BaseCommand) obj).getIdentifier());
-            getOnReceiveCommand().trigger((BaseCommand)obj);
+            RemoteCommand remoteCommand = (RemoteCommand) obj;
+            logger.i("Received " + remoteCommand.toString());
+            getDispatcher().sendCommand(remoteCommand.getInnerCommand());
         } catch (Exception e) {
             logger.e("Received incorrect object: " + e.getMessage());
             if(e.getMessage().equalsIgnoreCase("Connection reset")) {
-                getOnReceiveCommand().trigger(new ClosedCommand());
+                getDispatcher().sendCommand(new ClosedCommand());
                 return;
             }
         }
@@ -76,7 +77,14 @@ public class FollowerSocket extends BaseSocket {
 
     private void send(BaseCommand command) {
         try {
-            logger.i("Sending " + command.getIdentifier());
+            if(command instanceof ClosedCommand) {
+                socket.close();
+                return;
+            }
+            if(!(command instanceof RemoteCommand)) {
+                return;
+            }
+            logger.i("Sending " + command.toString());
             outputStream.writeObject(command);
         } catch (IOException e) {
             logger.e("Cannot send object: " + e.getMessage());

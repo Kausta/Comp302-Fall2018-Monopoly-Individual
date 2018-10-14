@@ -24,6 +24,7 @@ public class LobbyView extends CenteredNavigationView {
     public void onEnter() {
         super.onEnter();
 
+        viewModel.initLobby();
         this.draw(viewModel.getPlayerNames());
         this.viewModel.getUserNamesChanged().subscribe(this::draw);
         this.viewModel.getSuccessOrFailure().subscribe((success) -> {

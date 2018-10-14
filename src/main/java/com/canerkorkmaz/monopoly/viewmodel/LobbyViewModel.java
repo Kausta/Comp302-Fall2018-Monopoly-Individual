@@ -10,12 +10,15 @@ import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.Event;
 import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.event.UIEvent;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class LobbyViewModel {
+    private final Logger logger;
     private final LocalPlayerData configuration;
     private final ConnectionRepository connectionRepository;
     private final UIEvent<Boolean> successOrFailure;
@@ -24,62 +27,58 @@ public class LobbyViewModel {
     private final ArrayList<String> playerNames = new ArrayList<>();
 
     @Injected
-    public LobbyViewModel(LocalPlayerData configuration,
+    public LobbyViewModel(ILoggerFactory logger,
+                          LocalPlayerData configuration,
                           ConnectionRepository connectionRepository,
                           EventFactory eventFactory) {
+        this.logger = logger.createLogger(LobbyViewModel.class);
         this.configuration = configuration;
         this.connectionRepository = connectionRepository;
         this.successOrFailure = eventFactory.createUIEvent();
         this.userNamesChanged = eventFactory.createUIEvent();
         this.startGame = eventFactory.createVMEvent();
+
+    }
+
+    public void initLobby() {
         playerNames.addAll(Arrays.asList(configuration.getLocalPlayerNames()));
         userNamesChanged.trigger(this.playerNames);
 
         if (isServerMode()) {
-            connectionRepository.getOnReceive().subscribeOnce(this::onServerReceive);
+            connectionRepository.receiveLocalOnce(this::onServerReceive);
         } else {
-            connectionRepository.send(new PlayerNameData(Arrays.asList(configuration.getLocalPlayerNames())));
-            connectionRepository.getOnReceive().subscribeOnce(this::onClientReceive);
+            connectionRepository.receiveLocalOnce(this::onClientReceive);
+            connectionRepository.sendRemote(new PlayerNameData(Arrays.asList(configuration.getLocalPlayerNames())));
         }
         startGame.subscribe((unit) -> {
-            connectionRepository.send(new StartCommand());
+            connectionRepository.sendRemote(new StartCommand());
             this.successOrFailure.trigger(true);
         });
     }
 
-    private void onClientReceive(BaseCommand command) {
+    private boolean onClientReceive(BaseCommand command) {
+        logger.i("Got " + command.toString());
         switch (command.getIdentifier()) {
             case PlayerNameData.IDENTIFIER:
                 playerNames.clear();
                 PlayerNameData data = (PlayerNameData) command;
                 playerNames.addAll(data.getPlayerNames());
                 userNamesChanged.trigger(this.playerNames);
-                connectionRepository.getOnReceive().subscribeOnce(this::onClientWaitStart);
                 break;
-            case ClosedCommand.IDENTIFIER:
-                successOrFailure.trigger(false);
-                break;
-            default:
-                connectionRepository.getOnReceive().subscribeOnce(this::onClientReceive);
-                break;
-        }
-    }
-
-    private void onClientWaitStart(BaseCommand command) {
-        switch (command.getIdentifier()) {
             case StartCommand.IDENTIFIER:
                 successOrFailure.trigger(true);
-                break;
+                return true;
             case ClosedCommand.IDENTIFIER:
                 successOrFailure.trigger(false);
-                break;
+                return true;
             default:
-                connectionRepository.getOnReceive().subscribeOnce(this::onClientReceive);
                 break;
         }
+        return false;
     }
 
-    private void onServerReceive(BaseCommand command) {
+    private boolean onServerReceive(BaseCommand command) {
+        logger.i("Got " + command.toString());
         switch (command.getIdentifier()) {
             case PlayerNameData.IDENTIFIER:
                 PlayerNameData data = (PlayerNameData) command;
@@ -87,18 +86,17 @@ public class LobbyViewModel {
                 userNamesChanged.trigger(this.playerNames);
                 // So that no one can join now, as we're interested in one master one client only
                 connectionRepository.setGameStarted(true);
-                connectionRepository.send(new PlayerNameData(playerNames));
-                break;
+                connectionRepository.sendRemote(new PlayerNameData(playerNames));
+                return true;
             case ClosedCommand.IDENTIFIER:
                 playerNames.clear();
                 playerNames.addAll(Arrays.asList(configuration.getLocalPlayerNames()));
-                connectionRepository.getOnReceive().subscribeOnce(this::onServerReceive);
                 connectionRepository.setGameStarted(false);
-                break;
+                return false;
             default:
-                connectionRepository.getOnReceive().subscribeOnce(this::onServerReceive);
                 break;
         }
+        return false;
     }
 
     public UIEvent<Boolean> getSuccessOrFailure() {

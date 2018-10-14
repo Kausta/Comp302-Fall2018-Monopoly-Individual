@@ -1,30 +1,37 @@
 package com.canerkorkmaz.monopoly.domain.service;
 
 import com.canerkorkmaz.monopoly.data.model.ConnectionData;
-import com.canerkorkmaz.monopoly.data.model.SocketConnection;
+import com.canerkorkmaz.monopoly.data.socket.SocketConnection;
 import com.canerkorkmaz.monopoly.domain.data.ClientData;
 import com.canerkorkmaz.monopoly.domain.data.ServerData;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
+import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
+import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.DI;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.Event;
+import com.canerkorkmaz.monopoly.lib.event.EventInterface;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.socket.BaseSocket;
 import com.canerkorkmaz.monopoly.lib.socket.FollowerSocket;
 import com.canerkorkmaz.monopoly.lib.socket.MasterSocket;
 
+import java.util.function.Function;
+
 public class ConnectionRepository {
     private final Logger logger;
     private final ConnectionData data;
     private final SocketConnection socket;
+    private final CommandDispatcher dispatcher;
     private boolean gameStarted = false;
 
     @Injected
-    public ConnectionRepository(ILoggerFactory logger, ConnectionData data, SocketConnection socket) {
+    public ConnectionRepository(ILoggerFactory logger, ConnectionData data, SocketConnection socket, CommandDispatcher dispatcher) {
         this.logger = logger.createLogger(ConnectionRepository.class);
         this.data = data;
         this.socket = socket;
+        this.dispatcher = dispatcher;
     }
 
     public boolean isServer() {
@@ -80,12 +87,18 @@ public class ConnectionRepository {
         logger.i("Started socket");
     }
 
-    public void send(BaseCommand command) {
-        socket.getOnSend().trigger(command);
+    public void sendRemote(BaseCommand command) {
+        dispatcher.sendCommand(new RemoteCommand(command));
     }
 
-    public Event<BaseCommand> getOnReceive() {
-        return socket.getOnReceive();
+    public void receiveLocalOnce(Function<BaseCommand, Boolean> fn) {
+        dispatcher.subscribeOnce((command) -> {
+            logger.d(command.toString());
+            if(command instanceof RemoteCommand) {
+                return false;
+            }
+            return fn.apply(command);
+        });
     }
 
     public boolean isGameStarted() {
