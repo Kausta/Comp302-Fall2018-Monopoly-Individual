@@ -44,7 +44,8 @@ public class CreateGameView extends CenteredNavigationView {
 
         this.setContentPane(form.getContent());
 
-        this.viewModel.getSuccessfullyCreated().runIfNotHandled((unit) -> this.getNavigator().navigatePush(LobbyView.class));
+        this.viewModel.getSuccessfullyCreated().subscribe((unit) -> this.getNavigator().navigatePush(LobbyView.class));
+        viewModel.getErrorOccurred().subscribe((message) -> JOptionPane.showMessageDialog(null, "Error occurred: " + message));
     }
 
     private void validateAndTriggerVM() {

@@ -25,7 +25,7 @@ public class LocalPlayerRepository {
         // Persist old names while changing size
         String[] oldNames = this.localPlayerData.getLocalPlayerNames();
         String[] newNames = new String[localPlayerCount];
-        if(oldNames != null) {
+        if (oldNames != null) {
             int minSize = Math.min(previous, localPlayerCount);
             if (minSize >= 0) System.arraycopy(oldNames, 0, newNames, 0, minSize);
         }

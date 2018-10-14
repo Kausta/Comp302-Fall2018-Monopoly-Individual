@@ -50,7 +50,7 @@ public class UserNamesView extends CenteredNavigationView {
 
         this.setContentPane(form.getContent());
 
-        viewModel.getSuccessfullySetNames().runIfNotHandled((unit) ->
+        viewModel.getSuccessfullySetNames().subscribe((unit) ->
                 this.getNavigator().navigatePush(MenuView.class));
     }
 

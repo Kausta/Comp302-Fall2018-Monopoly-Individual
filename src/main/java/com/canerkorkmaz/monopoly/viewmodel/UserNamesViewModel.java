@@ -3,6 +3,7 @@ package com.canerkorkmaz.monopoly.viewmodel;
 import com.canerkorkmaz.monopoly.domain.service.LocalPlayerRepository;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.Event;
+import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.event.UIEvent;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;
 import com.canerkorkmaz.monopoly.view.data.UINameData;
@@ -15,16 +16,14 @@ public class UserNamesViewModel {
 
     @Injected
     public UserNamesViewModel(LocalPlayerRepository configuration,
-                              UIEvent<Unit> successfullySetNames,
-                              Event<UINameData> onContinueClick,
-                              Event<UINameData> onBackClick) {
+                              EventFactory eventFactory) {
         this.configuration = configuration;
-        this.successfullySetNames = successfullySetNames;
-        this.onContinueClick = onContinueClick;
-        this.onBackClick = onBackClick;
+        this.successfullySetNames = eventFactory.createUIEvent();
+        this.onContinueClick = eventFactory.createVMEvent();
+        this.onBackClick = eventFactory.createVMEvent();
 
-        this.onContinueClick.runIfNotHandled((data) -> this.setNames(data.getNames(), true));
-        this.onBackClick.runIfNotHandled((data) -> this.setNames(data.getNames(), false));
+        this.onContinueClick.subscribe((data) -> this.setNames(data.getNames(), true));
+        this.onBackClick.subscribe((data) -> this.setNames(data.getNames(), false));
     }
 
     public int getPlayerCount() {
@@ -33,8 +32,8 @@ public class UserNamesViewModel {
 
     public String[] getUserNames() {
         String[] names = this.configuration.getLocalPlayerNames();
-        for(int i = 0;i < names.length;i++){
-            if(names[i] == null) {
+        for (int i = 0; i < names.length; i++) {
+            if (names[i] == null) {
                 names[i] = "";
             }
         }
@@ -55,7 +54,7 @@ public class UserNamesViewModel {
 
     private void setNames(String[] names, boolean callSuccessful) {
         this.configuration.setLocalPlayerNames(names);
-        if(callSuccessful) {
+        if (callSuccessful) {
             this.successfullySetNames.trigger(Unit.INSTANCE);
         }
     }

@@ -39,14 +39,16 @@ public class JoinPeerView extends CenteredNavigationView {
                 .addVerticalSpace(15)
                 .addLabeledComponent("Peer Port: ", peerPortField)
                 .addVerticalSpace(15)
-                .addLabeledComponent("Your Port: ", portField)
-                .addVerticalSpace(15)
+                // We don't have peer to peer connection for now
+                // .addLabeledComponent("Your Port: ", portField)
+                // .addVerticalSpace(15)
                 .addButton("JOIN THE GAME", this::validateAndTriggerVM)
                 .addVerticalSpace(15)
                 .addButton("GO BACK", () -> this.getNavigator().navigatePop())
                 .build();
 
-        viewModel.getSuccessfullyCreated().runIfNotHandled((unit) -> this.getNavigator().navigatePush(LobbyView.class));
+        viewModel.getSuccessfullyCreated().subscribe((unit) -> this.getNavigator().navigatePush(LobbyView.class));
+        viewModel.getErrorOccurred().subscribe((message) -> JOptionPane.showMessageDialog(null, "Error occurred: " + message));
 
         this.setContentPane(form.getContent());
     }
@@ -55,10 +57,10 @@ public class JoinPeerView extends CenteredNavigationView {
         try {
             String ip = Validate.getValidatedIp(ipField.getText());
             int peerPort = Validate.getValidatedPort(peerPortField.getText());
-            int port = Validate.getValidatedPort(portField.getText());
+            //int port = Validate.getValidatedPort(portField.getText());
 
             viewModel.getOnCreateGameClick()
-                    .trigger(new UIGameJoinData(ip, peerPort, port));
+                    .trigger(new UIGameJoinData(ip, peerPort, /*port*/0));
         } catch (Exception e) {
             logger.e(e.getMessage());
             JOptionPane.showMessageDialog(null, "Error occurred: " + e.getMessage());
