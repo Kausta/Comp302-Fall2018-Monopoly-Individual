@@ -1,5 +1,7 @@
 package com.canerkorkmaz.monopoly.lib.logger;
 
+import com.canerkorkmaz.monopoly.constants.LogLevel;
+
 public interface ILoggerFactory {
     /**
      * Creates a default logger
@@ -15,5 +17,7 @@ public interface ILoggerFactory {
      * @return Class aware logger
      */
     Logger createLogger(Class<?> clazz);
+
+    void setLogLevel(LogLevel level);
 
 }

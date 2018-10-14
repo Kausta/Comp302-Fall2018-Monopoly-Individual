@@ -86,16 +86,17 @@ public class ConnectionRepository {
     }
 
     public void sendRemote(BaseCommand command) {
-        dispatcher.sendCommand(new RemoteCommand(command));
+        dispatcher.sendCommand(command);
     }
 
-    public void receiveLocalOnce(Function<BaseCommand, Boolean> fn) {
+    public void receiveRemoteOnce(Function<BaseCommand, Boolean> fn) {
         dispatcher.subscribeOnce((command) -> {
             logger.d(command.toString());
-            if (command instanceof RemoteCommand) {
+            // We are expecting a command coming from remote connection
+            if (!(command instanceof RemoteCommand)) {
                 return false;
             }
-            return fn.apply(command);
+            return fn.apply(((RemoteCommand) command).getInnerCommand());
         });
     }
 

@@ -45,9 +45,9 @@ public class LobbyViewModel {
         userNamesChanged.trigger(this.playerNames);
 
         if (isServerMode()) {
-            connectionRepository.receiveLocalOnce(this::onServerReceive);
+            connectionRepository.receiveRemoteOnce(this::onServerReceive);
         } else {
-            connectionRepository.receiveLocalOnce(this::onClientReceive);
+            connectionRepository.receiveRemoteOnce(this::onClientReceive);
             connectionRepository.sendRemote(new PlayerNameData(Arrays.asList(configuration.getLocalPlayerNames())));
         }
         startGame.subscribe((unit) -> {

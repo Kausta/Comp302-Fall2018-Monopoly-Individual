@@ -1,5 +1,6 @@
 package com.canerkorkmaz.monopoly;
 
+import com.canerkorkmaz.monopoly.constants.LogLevel;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
 import com.canerkorkmaz.monopoly.lib.di.DI;
 import com.canerkorkmaz.monopoly.lib.di.DIRegistry;
@@ -17,13 +18,13 @@ import javax.swing.*;
  */
 public class Application implements Runnable {
     private final Logger logger;
-    private final CommandDispatcher dispatcher;
 
     @Injected
     public Application(ILoggerFactory loggerFactory, CommandDispatcher dispatcher) {
-        this.logger = loggerFactory.createLogger(Application.class);
-        this.dispatcher = dispatcher;
+        // Start command dispatcher
         dispatcher.runDispatcher();
+
+        this.logger = loggerFactory.createLogger(Application.class);
 
         logger.i("Created new Monopoly Application");
     }

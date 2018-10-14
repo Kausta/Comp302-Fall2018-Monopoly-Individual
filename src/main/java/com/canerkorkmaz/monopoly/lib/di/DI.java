@@ -41,7 +41,7 @@ public final class DI {
 
     public <T> void register(Class<T> clazz, Class<? extends T> actualClazz) {
         this.registry.put(clazz.getName(), actualClazz);
-        logger.i(String.format("Registered %s to dependency injection with factory %s",
+        logger.d(String.format("Registered %s to dependency injection with factory %s",
                 clazz.getSimpleName(),
                 actualClazz.getSimpleName()));
     }
