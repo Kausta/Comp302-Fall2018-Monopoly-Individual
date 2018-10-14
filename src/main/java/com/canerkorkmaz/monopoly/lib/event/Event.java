@@ -1,6 +1,5 @@
 package com.canerkorkmaz.monopoly.lib.event;
 
-import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.threading.IThreadScheduler;
 
 import java.util.Observable;

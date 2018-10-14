@@ -2,12 +2,9 @@ package com.canerkorkmaz.monopoly.lib.socket;
 
 import com.canerkorkmaz.monopoly.domain.data.ServerData;
 import com.canerkorkmaz.monopoly.domain.service.ConnectionRepository;
-import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
 import com.canerkorkmaz.monopoly.lib.di.DI;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
-import com.canerkorkmaz.monopoly.lib.event.Event;
-import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
@@ -51,7 +48,7 @@ public class MasterSocket extends BaseSocket {
         }
         try {
             Socket client = socket.accept();
-            if(repository.isGameStarted()) {
+            if (repository.isGameStarted()) {
                 throw new IOException("Not accepting connections when started, rejected");
             }
             MasterConnectionSocket connectionSocket = new MasterConnectionSocket(DI.get(ILoggerFactory.class), client, getDispatcher());

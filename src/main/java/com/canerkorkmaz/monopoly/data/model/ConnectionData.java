@@ -4,6 +4,7 @@ public class ConnectionData {
     private Mode mode;
     private String ip;
     private int port;
+
     public ConnectionData() {
     }
 

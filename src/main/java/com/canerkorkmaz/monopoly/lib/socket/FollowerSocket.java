@@ -54,12 +54,12 @@ public class FollowerSocket extends BaseSocket {
     protected void onRun() {
         try {
             Object obj = inputStream.readObject();
-            if(obj == null) {
+            if (obj == null) {
                 logger.i("Closing connection!");
                 getDispatcher().sendCommand(new ClosedCommand());
                 return;
             }
-            if(!(obj instanceof RemoteCommand)) {
+            if (!(obj instanceof RemoteCommand)) {
                 throw new RuntimeException("Received incorrect object");
             }
             RemoteCommand remoteCommand = (RemoteCommand) obj;
@@ -67,7 +67,7 @@ public class FollowerSocket extends BaseSocket {
             getDispatcher().sendCommand(remoteCommand.getInnerCommand());
         } catch (Exception e) {
             logger.e("Received incorrect object: " + e.getMessage());
-            if(e.getMessage().equalsIgnoreCase("Connection reset")) {
+            if (e.getMessage().equalsIgnoreCase("Connection reset")) {
                 getDispatcher().sendCommand(new ClosedCommand());
                 return;
             }
@@ -77,11 +77,11 @@ public class FollowerSocket extends BaseSocket {
 
     private void send(BaseCommand command) {
         try {
-            if(command instanceof ClosedCommand) {
+            if (command instanceof ClosedCommand) {
                 socket.close();
                 return;
             }
-            if(!(command instanceof RemoteCommand)) {
+            if (!(command instanceof RemoteCommand)) {
                 return;
             }
             logger.i("Sending " + command.toString());

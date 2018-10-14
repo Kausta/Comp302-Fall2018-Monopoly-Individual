@@ -28,7 +28,7 @@ public class LobbyView extends CenteredNavigationView {
         this.draw(viewModel.getPlayerNames());
         this.viewModel.getUserNamesChanged().subscribe(this::draw);
         this.viewModel.getSuccessOrFailure().subscribe((success) -> {
-            if(success) {
+            if (success) {
                 this.getNavigator().navigateReplace(GameView.class);
             } else {
                 this.getNavigator().navigatePop();

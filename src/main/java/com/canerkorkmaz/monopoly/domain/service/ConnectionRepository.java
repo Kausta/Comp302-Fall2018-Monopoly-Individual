@@ -9,8 +9,6 @@ import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
 import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.DI;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
-import com.canerkorkmaz.monopoly.lib.event.Event;
-import com.canerkorkmaz.monopoly.lib.event.EventInterface;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.socket.BaseSocket;
@@ -74,9 +72,9 @@ public class ConnectionRepository {
 
     public void start() {
         BaseSocket baseSocket;
-        if(isServer()) {
+        if (isServer()) {
             baseSocket = DI.get(MasterSocket.class);
-        } else if(isClient()) {
+        } else if (isClient()) {
             baseSocket = DI.get(FollowerSocket.class);
         } else {
             throw new RuntimeException("Undetermined socket mode");
@@ -94,7 +92,7 @@ public class ConnectionRepository {
     public void receiveLocalOnce(Function<BaseCommand, Boolean> fn) {
         dispatcher.subscribeOnce((command) -> {
             logger.d(command.toString());
-            if(command instanceof RemoteCommand) {
+            if (command instanceof RemoteCommand) {
                 return false;
             }
             return fn.apply(command);
