@@ -99,6 +99,7 @@ public final class DI {
             try {
                 return (T) emptyConstructor.newInstance();
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException("Cannot create class using DI", e);
             }
         }
@@ -111,6 +112,7 @@ public final class DI {
         try {
             return (T) annotatedConstructor.newInstance(parameters);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Cannot create class using DI", e);
         }
     }

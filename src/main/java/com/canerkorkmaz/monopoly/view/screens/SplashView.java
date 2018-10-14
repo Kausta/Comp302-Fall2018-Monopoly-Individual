@@ -19,6 +19,6 @@ public class SplashView extends CenteredNavigationView {
 
         logger.i("Created Splash Frame");
 
-        TimerUtils.runDelayedOnce(1000, e -> this.getNavigator().navigateReplace(MenuView.class));
+        TimerUtils.runDelayedOnce(1000, e -> this.getNavigator().navigateReplace(UserCountView.class));
     }
 }

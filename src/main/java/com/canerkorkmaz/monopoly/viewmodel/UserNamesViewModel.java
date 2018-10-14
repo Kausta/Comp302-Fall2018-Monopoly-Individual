@@ -1,30 +1,43 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
-import com.canerkorkmaz.monopoly.data.GameConfiguration;
+import com.canerkorkmaz.monopoly.domain.service.LocalPlayerRepository;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.Event;
+import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.event.UIEvent;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;
 import com.canerkorkmaz.monopoly.view.data.UINameData;
 
 public class UserNamesViewModel {
-    private final GameConfiguration configuration;
+    private final LocalPlayerRepository configuration;
     private final UIEvent<Unit> successfullySetNames;
     private final Event<UINameData> onContinueClick;
+    private final Event<UINameData> onBackClick;
 
     @Injected
-    public UserNamesViewModel(GameConfiguration configuration,
-                              UIEvent<Unit> successfullySetNames,
-                              Event<UINameData> onContinueClick) {
+    public UserNamesViewModel(LocalPlayerRepository configuration,
+                              EventFactory eventFactory) {
         this.configuration = configuration;
-        this.successfullySetNames = successfullySetNames;
-        this.onContinueClick = onContinueClick;
+        this.successfullySetNames = eventFactory.createUIEvent();
+        this.onContinueClick = eventFactory.createVMEvent();
+        this.onBackClick = eventFactory.createVMEvent();
 
-        this.onContinueClick.runIfNotHandled((data) -> this.setNames(data.getNames()));
+        this.onContinueClick.subscribe((data) -> this.setNames(data.getNames(), true));
+        this.onBackClick.subscribe((data) -> this.setNames(data.getNames(), false));
     }
 
     public int getPlayerCount() {
-        return this.configuration.getNumLocalPlayers();
+        return this.configuration.getLocalPlayerCount();
+    }
+
+    public String[] getUserNames() {
+        String[] names = this.configuration.getLocalPlayerNames();
+        for (int i = 0; i < names.length; i++) {
+            if (names[i] == null) {
+                names[i] = "Player " + i;
+            }
+        }
+        return names;
     }
 
     public UIEvent<Unit> getSuccessfullySetNames() {
@@ -35,12 +48,14 @@ public class UserNamesViewModel {
         return onContinueClick;
     }
 
-    private void setNames(String[] names) {
-        String[] configurationNames = this.configuration.getLocalPlayerNames();
-        if (configurationNames.length != names.length) {
-            throw new RuntimeException("Problem, configuration is out of sync");
+    public Event<UINameData> getOnBackClick() {
+        return onBackClick;
+    }
+
+    private void setNames(String[] names, boolean callSuccessful) {
+        this.configuration.setLocalPlayerNames(names);
+        if (callSuccessful) {
+            this.successfullySetNames.trigger(Unit.INSTANCE);
         }
-        System.arraycopy(names, 0, configurationNames, 0, configurationNames.length);
-        this.successfullySetNames.trigger(Unit.INSTANCE);
     }
 }
