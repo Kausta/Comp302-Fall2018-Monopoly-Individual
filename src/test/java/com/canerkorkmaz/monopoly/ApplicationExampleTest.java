@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 class ApplicationExampleTest {
 
     @Test
-    void testMainSuccessfullyRunsWithNoArguments() {
-        Application.main(new String[]{});
+    void testCanCreateApplication() {
+        new Application();
     }
 
 }
