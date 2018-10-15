@@ -9,6 +9,7 @@ import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
 import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.logger.DefaultLoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.view.resources.MonopolyImageLoader;
 
 public class DIRegistry {
     public DIRegistry() {
@@ -29,5 +30,7 @@ public class DIRegistry {
         // Services
         registry.register(LocalPlayerRepository.class);
         registry.register(ConnectionRepository.class);
+        // Resource Loaders
+        registry.registerSingleton(MonopolyImageLoader.class );
     }
 }
