@@ -3,6 +3,7 @@ package com.canerkorkmaz.monopoly.viewmodel;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
+import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.event.UIEvent;
@@ -24,11 +25,18 @@ public class GameViewModel {
         dispatcher.subscribe(this::commandHandler);
     }
 
-    private void commandHandler(BaseCommand command) {
-        if(command instanceof ClosedCommand) {
-            logger.i("Closing application");
-            this.closeApplication.trigger(Unit.INSTANCE);
-            return;
+    private void commandHandler(BaseCommand incomingCommand) {
+        BaseCommand command = incomingCommand;
+        if (command instanceof RemoteCommand) {
+            command = ((RemoteCommand) command).getInnerCommand();
+        }
+        switch (command.getIdentifier()) {
+            case ClosedCommand.IDENTIFIER:
+                logger.i("Closing application");
+                this.closeApplication.trigger(Unit.INSTANCE);
+                break;
+            default:
+                logger.w("Didn't expect command: " + command.toString());
         }
     }
 

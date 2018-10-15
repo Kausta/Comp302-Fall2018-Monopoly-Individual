@@ -31,7 +31,7 @@ public final class SocketCommandDispatcher {
             dispatcher.sendCommand(remoteCommand);
         } catch (Exception e) {
             logger.e("Received incorrect object: " + e.getMessage());
-            if (e.getMessage().equalsIgnoreCase("Connection reset")) {
+            if (e.getMessage().equalsIgnoreCase("Connection reset") || e.getMessage().equalsIgnoreCase("socket closed")) {
                 dispatcher.sendCommand(new ClosedCommand());
                 return true;
             }
