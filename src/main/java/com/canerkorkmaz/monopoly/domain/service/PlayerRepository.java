@@ -62,6 +62,7 @@ public class PlayerRepository {
         List<String> initialOrder = playerDatas.stream()
                 .map(InitialPlayerData::getPlayerName)
                 .collect(Collectors.toList());
+        setOrderings(initialOrder);
         playerData.setPlayerOrder(initialOrder);
     }
 
@@ -84,7 +85,18 @@ public class PlayerRepository {
                 .map(PlayerModel::getPlayerName)
                 .collect(Collectors.toList());
 
+        for(PlayerModel player: playerData.getPlayerList().values()) {
+            player.setInitialRoll(0);
+        }
+
+        setOrderings(order);
         playerData.setPlayerOrder(order);
+    }
+
+    private void setOrderings(List<String> order) {
+        for(int i = 0;i < order.size();i++){
+            playerData.getPlayer(order.get(i)).setOrder(i);
+        }
     }
 
     public boolean isFromThisClient(PlayerModel model) {

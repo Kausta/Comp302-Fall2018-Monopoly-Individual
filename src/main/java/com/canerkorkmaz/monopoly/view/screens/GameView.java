@@ -7,6 +7,7 @@ import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.util.GridBagConstraintsBuilder;
 import com.canerkorkmaz.monopoly.view.components.Form;
+import com.canerkorkmaz.monopoly.view.components.MonopolyBoxHolder;
 import com.canerkorkmaz.monopoly.view.navigation.NavigationView;
 import com.canerkorkmaz.monopoly.view.resources.MonopolyImageLoader;
 import com.canerkorkmaz.monopoly.viewmodel.GameViewModel;
@@ -24,18 +25,22 @@ public class GameView extends NavigationView {
     private static final int WIDE = 220;
     private static final int GRID_NARROW = 11;
     private static final int GRID_WIDE = 22;
+    private static final int PLAYER_SIZE = 4;
 
     private final Logger logger;
     private final GameViewModel viewModel;
     private final MonopolyImageLoader loader;
 
+    private JPanel overlayPane;
     private JPanel rootPane;
     private JPanel left;
     private JPanel right;
     private JPanel rollMenu;
-    private JComponent[] monopolyBoxes;
+    private JPanel monopolyPanel;
+    private MonopolyBoxHolder[] monopolyBoxes;
     private JPanel playerList;
     private Map<String, JPanel> playerPanels;
+    private Map<String, JPanel> playerImages;
 
     private Dimension size;
     private int leftWidth;
@@ -61,15 +66,31 @@ public class GameView extends NavigationView {
         viewModel.getCloseApplication().subscribe(unit ->
                 this.getNavigator().exitApplication());
         viewModel.getRedrawPanel().subscribe(this::populatePlayer);
-        viewModel.getEndOrderTurn().subscribe(unit -> {
-            populatePlayers();
-            drawOrderRollMenu(viewModel.getCurrentPlayer());
+        viewModel.getEndOrderTurn().subscribe(finished -> {
+            if (finished) {
+                populatePlayers();
+                drawPlayers(viewModel.getPlayers());
+                drawMenu(viewModel.getCurrentPlayer());
+            } else {
+                populatePlayers();
+                drawOrderRollMenu(viewModel.getCurrentPlayer());
+            }
+        });
+        viewModel.getPlayerMove().subscribe(change -> {
+            PlayerModel model = viewModel.getCurrentPlayer();
+            model.setLocation((model.getLocation() + change) % 20);
+            drawMenu(model);
+            populatePlayer(model);
+            drawPlayer(model);
+        });
+        viewModel.getEndTurn().subscribe(unit -> {
+            drawMenu(viewModel.getCurrentPlayer());
         });
     }
 
     @Override
     public JComponent getRoot() {
-        return this.rootPane;
+        return this.overlayPane;
     }
 
     private void drawUI() {
@@ -78,12 +99,14 @@ public class GameView extends NavigationView {
         rightWidth = (size.width * 3) / 7 - 6;
         height = size.height - 10;
 
-        monopolyBoxes = new JComponent[20];
+        monopolyBoxes = new MonopolyBoxHolder[20];
 
         left = new JPanel();
         left.setBackground(Colors.BACKGROUND_COLOR);
         left.setLayout(new BorderLayout());
-        left.add(populateMonopoly(), BorderLayout.CENTER);
+        populateMonopoly();
+        drawPlayers(viewModel.getPlayers());
+        left.add(monopolyPanel, BorderLayout.CENTER);
         left.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         right = new JPanel();
@@ -129,6 +152,13 @@ public class GameView extends NavigationView {
         rootPane.add(left);
         rootPane.add(Box.createHorizontalStrut(2));
         rootPane.add(right);
+
+        overlayPane = new JPanel(null);
+        overlayPane.add(rootPane);
+
+        rootPane.setBounds(0, 0, size.width, size.height);
+        overlayPane.setBounds(0, 0, size.width, size.height);
+
     }
 
     private JPanel getMonopolySquare(int x, int y, int width, int height) {
@@ -150,7 +180,7 @@ public class GameView extends NavigationView {
     }
 
     private JPanel populateMonopoly() {
-        JPanel monopolyPanel = new JPanel();
+        monopolyPanel = new JPanel();
         monopolyPanel.setLayout(new GridBagLayout());
         monopolyPanel.setBackground(Colors.BACKGROUND_COLOR);
         int pos = 0;
@@ -159,20 +189,16 @@ public class GameView extends NavigationView {
             boolean isCorner = (i % 5) == 0;
             int width = isCorner ? GRID_WIDE : GRID_NARROW;
             JComponent component = getMonopolySquare(i, 0, isCorner ? WIDE : NARROW, WIDE);
-            monopolyBoxes[arrayIndex++] = component;
-            monopolyPanel.add(component, new GridBagConstraintsBuilder()
-                    .setPosition(pos, 0)
-                    .setSize(width, GRID_WIDE)
-                    .build());
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, pos, 0, width, GRID_WIDE);
+            monopolyBoxes[arrayIndex++] = holder;
+            monopolyPanel.add(component, holder.createConstraints());
             pos += width;
         }
         for (int i = 0; i < 4; i++) {
             JComponent component = getMonopolySquare(5, i + 1, WIDE, NARROW);
-            monopolyBoxes[arrayIndex++] = component;
-            monopolyPanel.add(component, new GridBagConstraintsBuilder()
-                    .setPosition(GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + i * GRID_NARROW)
-                    .setSize(GRID_WIDE, GRID_NARROW)
-                    .build());
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + i * GRID_NARROW, GRID_WIDE, GRID_NARROW);
+            monopolyBoxes[arrayIndex++] = holder;
+            monopolyPanel.add(component, holder.createConstraints());
         }
         pos = 0;
         for (int i = 0; i < 6; i++) {
@@ -180,19 +206,15 @@ public class GameView extends NavigationView {
             int width = isCorner ? GRID_WIDE : GRID_NARROW;
             pos += width;
             JComponent component = getMonopolySquare(5 - i, 5, isCorner ? WIDE : NARROW, WIDE);
-            monopolyBoxes[arrayIndex++] = component;
-            monopolyPanel.add(component, new GridBagConstraintsBuilder()
-                    .setPosition(2 * GRID_WIDE + 4 * GRID_NARROW - pos, GRID_WIDE + 4 * GRID_NARROW)
-                    .setSize(width, GRID_WIDE)
-                    .build());
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, 2 * GRID_WIDE + 4 * GRID_NARROW - pos, GRID_WIDE + 4 * GRID_NARROW, width, GRID_WIDE);
+            monopolyBoxes[arrayIndex++] = holder;
+            monopolyPanel.add(component, holder.createConstraints());
         }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 3; i >= 0; i--) {
             JComponent component = getMonopolySquare(0, 5 - i - 1, WIDE, NARROW);
-            monopolyBoxes[arrayIndex++] = component;
-            monopolyPanel.add(component, new GridBagConstraintsBuilder()
-                    .setPosition(0, GRID_WIDE + i * GRID_NARROW)
-                    .setSize(GRID_WIDE, GRID_NARROW)
-                    .build());
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, 0, GRID_WIDE + i * GRID_NARROW, GRID_WIDE, GRID_NARROW);
+            monopolyBoxes[arrayIndex++] = holder;
+            monopolyPanel.add(component, holder.createConstraints());
         }
         JPanel middle = new JPanel();
         middle.setBackground(Colors.BACKGROUND_COLOR);
@@ -206,7 +228,6 @@ public class GameView extends NavigationView {
     private void populatePlayers() {
         java.util.List<PlayerModel> players = viewModel.getPlayers();
         for (int i = 0; i < players.size(); i += 3) {
-            logger.i("Panel row " + i);
             JPanel row = new JPanel();
             row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
             for (int j = 0; j < 3 && i + j < players.size(); j++) {
@@ -263,7 +284,7 @@ public class GameView extends NavigationView {
                     drawOrderRollMenu(model);
                 }, isCurrentUser && !viewModel.isRolled(model))
                 .addButton("END TURN", () -> {
-                    viewModel.dispatchEndTurn();
+                    viewModel.dispatchEndInitialTurn();
                     drawOrderRollMenu(model);
                 }, isCurrentUser && viewModel.isRolled(model))
                 .build()
@@ -277,7 +298,45 @@ public class GameView extends NavigationView {
         rollMenu.removeAll();
         JPanel panel = getInitialMenu(model);
         rollMenu.add(panel);
-        redrawComponent(rollMenu);
+        redrawComponent(right);
+    }
+
+    private JPanel getMenu(PlayerModel model) {
+        boolean isCurrentUser = viewModel.isFromThisClient(model);
+        if (!viewModel.rolledThisTurn(model)) {
+            return new Form.Builder()
+                    .addLabeledText("Turn of: ", model.getPlayerName())
+                    .addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !viewModel.isRolled(model))
+                    .build()
+                    .getContent();
+        } else {
+            return new Form.Builder()
+                    .addLabeledText("Turn of: ", model.getPlayerName())
+                    .addLabeledText("Rolled: ", model.getRollString())
+                    .addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser)
+                    .build()
+                    .getContent();
+        }
+    }
+
+    private void drawMenu(PlayerModel model) {
+        if (rollMenu == null) {
+            rollMenu = new JPanel();
+        }
+        rollMenu.removeAll();
+        JPanel panel = getMenu(model);
+        rollMenu.add(panel);
+        redrawComponent(right);
+    }
+
+    private void drawPlayers(java.util.List<PlayerModel> playerList) {
+        if (playerImages == null) {
+            playerImages = new HashMap<>();
+        }
+
+        for (PlayerModel playerModel : playerList) {
+            drawPlayer(playerModel);
+        }
     }
 
     private void redrawComponent(JComponent component) {
@@ -287,4 +346,53 @@ public class GameView extends NavigationView {
             root.repaint(component.getBounds());
         }
     }
+
+    private void drawPlayer(PlayerModel player) {
+        int playerLocation = player.getLocation();
+        MonopolyBoxHolder panel = monopolyBoxes[playerLocation];
+        int x = panel.getGridX();
+        int y = panel.getGridY();
+
+        int location = player.getOrder();
+
+        int xOffset;
+        int yOffset;
+        if ((playerLocation >= 0 && playerLocation <= 5) || (playerLocation >= 10 && playerLocation <= 15)) {
+            yOffset = 1 + (location / 4) * (PLAYER_SIZE + 1);
+            xOffset = 1 + (location % 4) * (PLAYER_SIZE + 1);
+        } else {
+            xOffset = 1 + (location / 4) * (PLAYER_SIZE + 1);
+            yOffset = 1 + (location % 4) * (PLAYER_SIZE + 1);
+        }
+
+        JPanel playerBox = playerImages.get(player.getPlayerName());
+        if (playerBox == null) {
+            BufferedImage playerImage = new BufferedImage(40, 40, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = playerImage.createGraphics();
+
+            graphics.setPaint(player.getBackgroundColor());
+            graphics.fillRect(0, 0, playerImage.getWidth(), playerImage.getHeight());
+
+            playerBox = new JPanel();
+            playerBox.setBackground(new Color(0, 0, 0, 0));
+            playerBox.add(new JLabel(new ImageIcon(playerImage)));
+        }
+
+        monopolyPanel.remove(playerBox);
+        monopolyPanel.validate();
+
+        monopolyPanel.add(playerBox, new GridBagConstraintsBuilder()
+                .setPosition(x + yOffset, y + xOffset)
+                .setSize(PLAYER_SIZE, PLAYER_SIZE)
+                .build());
+        monopolyPanel.setComponentZOrder(playerBox, 0);
+
+        logger.i("Placing player at " + playerLocation + " to " + (x + xOffset) + ", " + (y + yOffset));
+        playerImages.put(player.getPlayerName(), playerBox);
+
+        monopolyPanel.validate();
+        monopolyPanel.repaint();
+    }
+
+
 }

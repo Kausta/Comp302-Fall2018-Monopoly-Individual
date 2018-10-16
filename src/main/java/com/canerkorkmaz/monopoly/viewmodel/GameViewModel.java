@@ -1,10 +1,7 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
 import com.canerkorkmaz.monopoly.data.model.PlayerModel;
-import com.canerkorkmaz.monopoly.domain.command.ClosedCommand;
-import com.canerkorkmaz.monopoly.domain.command.EndOrderCommand;
-import com.canerkorkmaz.monopoly.domain.command.OrderRollCommand;
-import com.canerkorkmaz.monopoly.domain.command.RemoteCommand;
+import com.canerkorkmaz.monopoly.domain.command.*;
 import com.canerkorkmaz.monopoly.domain.service.PlayerRepository;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
@@ -25,7 +22,9 @@ public class GameViewModel {
     private final PlayerRepository playerRepository;
     private final UIEvent<Unit> closeApplication;
     private final UIEvent<PlayerModel> redrawPanel;
-    private final UIEvent<Unit> endOrderTurn;
+    private final UIEvent<Boolean> endOrderTurn;
+    private final UIEvent<Integer> playerMove;
+    private final UIEvent<Unit> endTurn;
 
     private int currentPlayerIndex = 0;
 
@@ -40,6 +39,8 @@ public class GameViewModel {
         this.closeApplication = eventFactory.createUIEvent();
         this.redrawPanel = eventFactory.createUIEvent();
         this.endOrderTurn = eventFactory.createUIEvent();
+        this.playerMove = eventFactory.createUIEvent();
+        this.endTurn = eventFactory.createUIEvent();
 
         dispatcher.subscribe(this::commandHandler);
     }
@@ -68,8 +69,21 @@ public class GameViewModel {
                     // Start Game
                     this.playerRepository.sortAccordingToInitialRoll();
                     currentPlayerIndex = 0;
+                    endOrderTurn.trigger(true);
+                } else {
+                    endOrderTurn.trigger(false);
                 }
-                endOrderTurn.trigger(Unit.INSTANCE);
+                break;
+            case RollCommand.IDENTIFIER:
+                RollCommand newRoll = (RollCommand) command;
+                PlayerModel player = getCurrentPlayer();
+                player.setRoll(newRoll.getRoll1(), newRoll.getRoll2());
+                playerMove.trigger(player.getRoll());
+                break;
+            case EndTurnCommand.IDENTIFIER:
+                getCurrentPlayer().setRoll(0, 0);
+                this.currentPlayerIndex = (((EndTurnCommand) command).getPlayerIndex() + 1) % this.playerRepository.getPlayerCount();
+                endTurn.trigger(Unit.INSTANCE);
                 break;
             default:
                 logger.w("Didn't expect command: " + command.toString());
@@ -85,7 +99,6 @@ public class GameViewModel {
     }
 
     public PlayerModel getCurrentPlayer() {
-        logger.i("Getting player " + currentPlayerIndex);
         return this.playerRepository.getPlayerList().get(currentPlayerIndex);
     }
 
@@ -101,19 +114,39 @@ public class GameViewModel {
         return playerModel.getInitialRoll() != 0;
     }
 
+    public boolean rolledThisTurn(PlayerModel playerModel) {
+        return playerModel.getRoll() != 0;
+    }
+
     public void dispatchSetInitialRoll() {
-        dispatcher.sendCommand(new OrderRollCommand(getCurrentPlayer().getPlayerName(), r.nextInt(6), r.nextInt(6)));
+        dispatcher.sendCommand(new OrderRollCommand(getCurrentPlayer().getPlayerName(), 1 + r.nextInt(6), 1 + r.nextInt(6)));
+    }
+
+    public void dispatchEndInitialTurn() {
+        dispatcher.sendCommand(new EndOrderCommand(currentPlayerIndex));
+    }
+
+    public void dispatchRoll() {
+        dispatcher.sendCommand(new RollCommand(getCurrentPlayer().getPlayerName(), 1 + r.nextInt(6), 1 + r.nextInt(6)));
     }
 
     public void dispatchEndTurn() {
-        dispatcher.sendCommand(new EndOrderCommand(currentPlayerIndex));
+        dispatcher.sendCommand(new EndTurnCommand(currentPlayerIndex));
     }
 
     public UIEvent<PlayerModel> getRedrawPanel() {
         return redrawPanel;
     }
 
-    public UIEvent<Unit> getEndOrderTurn() {
+    public UIEvent<Boolean> getEndOrderTurn() {
         return endOrderTurn;
+    }
+
+    public UIEvent<Integer> getPlayerMove() {
+        return playerMove;
+    }
+
+    public UIEvent<Unit> getEndTurn() {
+        return endTurn;
     }
 }
