@@ -1,21 +1,27 @@
 package com.canerkorkmaz.monopoly.lib.command;
 
+import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.EventInterface;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.threading.IThreadScheduler;
 import com.canerkorkmaz.monopoly.lib.threading.NamedThreadScheduler;
 
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Function;
 
 public class CommandDispatcher {
-    private Vector<Function<BaseCommand, Boolean>> commandFns = new Vector<>();
+    private final Logger logger;
+    private LinkedList<Function<BaseCommand, Boolean>> commandFns = new LinkedList<>();
     private BlockingQueue<BaseCommand> commands = new ArrayBlockingQueue<>(1024);
     private IThreadScheduler scheduler = new NamedThreadScheduler("Command-Dispatcher");
 
-    public CommandDispatcher() {
+    @Injected
+    public CommandDispatcher(ILoggerFactory logger) {
+        this.logger = logger.createLogger(CommandDispatcher.class);
     }
 
     public void runDispatcher() {
@@ -23,24 +29,29 @@ public class CommandDispatcher {
     }
 
     private void run() {
-        try {
-            BaseCommand command = commands.take();
-            Iterator<Function<BaseCommand, Boolean>> it = commandFns.iterator();
-            while (it.hasNext()) {
-                Function<BaseCommand, Boolean> holder = it.next();
-                Boolean b = holder.apply(command);
-                if (b) {
-                    it.remove();
+        while (true) {
+            try {
+                BaseCommand command = commands.take();
+                logger.i("Got command " + command.toString());
+                logger.i("Starting handling with " + commandFns.size());
+                Iterator<Function<BaseCommand, Boolean>> it = commandFns.iterator();
+                while (it.hasNext()) {
+                    Function<BaseCommand, Boolean> holder = it.next();
+                    Boolean b = holder.apply(command);
+                    if (b) {
+                        it.remove();
+                    }
                 }
+                logger.i("Finished with " + commandFns.size());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return;
         }
-        this.runDispatcher();
     }
 
     public void sendCommand(BaseCommand command) {
+        logger.i("Sending command " + command.toString());
         commands.add(command);
     }
 

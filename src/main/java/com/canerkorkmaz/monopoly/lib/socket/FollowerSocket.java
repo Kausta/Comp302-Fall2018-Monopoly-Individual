@@ -3,9 +3,7 @@ package com.canerkorkmaz.monopoly.lib.socket;
 import com.canerkorkmaz.monopoly.domain.data.ClientData;
 import com.canerkorkmaz.monopoly.domain.service.ConnectionRepository;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
-import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
-import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
@@ -52,7 +50,7 @@ public class FollowerSocket extends BaseSocket {
 
     @Override
     protected void onRun() {
-        if(SocketCommandDispatcher.receiveCommandFromSocket(socket, getDispatcher(), logger, inputStream)) {
+        if (SocketCommandDispatcher.receiveCommandFromSocket(socket, getDispatcher(), logger, inputStream)) {
             return;
         }
         this.run();

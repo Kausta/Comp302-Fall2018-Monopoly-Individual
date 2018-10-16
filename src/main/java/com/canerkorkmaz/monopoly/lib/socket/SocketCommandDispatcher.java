@@ -1,9 +1,9 @@
 package com.canerkorkmaz.monopoly.lib.socket;
 
+import com.canerkorkmaz.monopoly.domain.command.ClosedCommand;
+import com.canerkorkmaz.monopoly.domain.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
-import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
-import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
 import java.io.IOException;

@@ -89,7 +89,39 @@ public class Form implements ActionListener {
             return this;
         }
 
+        public Builder addLabeledText(String labelText, String text) {
+            JPanel container = new JPanel();
+            GridBagLayout layout = new GridBagLayout();
+            container.setLayout(layout);
+            container.setBackground(backgroundColor);
+
+            JLabel label = new JLabel(labelText);
+            label.setFont(new Font("Monospaced", Font.PLAIN, 20));
+            container.add(label, new GridBagConstraintsBuilder()
+                    .setPosition(0, 0)
+                    .setSize(1, 1)
+                    .setAnchor(GridBagConstraints.LINE_START)
+                    .build());
+            JLabel component = new JLabel(text);
+            component.setFont(new Font("Monospaced", Font.PLAIN, 20));
+            container.add(component, new GridBagConstraintsBuilder()
+                    .setPosition(1, 0)
+                    .setSize(1, 1)
+                    .setAnchor(GridBagConstraints.LINE_END)
+                    .setWeightX(1.)
+                    .setFill(GridBagConstraints.HORIZONTAL)
+                    .build());
+
+            components.add(container);
+
+            return this;
+        }
+
         public Builder addButton(String text, Runnable onClick) {
+            return this.addButton(text, onClick, true);
+        }
+
+        public Builder addButton(String text, Runnable onClick, boolean clickable) {
             JButton button = new JButton(text);
             button.setFont(new Font("Monospaced", Font.BOLD, 24));
             button.setHorizontalAlignment(SwingConstants.CENTER);
@@ -98,7 +130,13 @@ public class Form implements ActionListener {
             String identifier = UUID.randomUUID() + " | " + text;
             button.setActionCommand(identifier);
             button.addActionListener(form);
-            form.onClicks.put(identifier, onClick);
+            button.setEnabled(clickable);
+            if (clickable) {
+                form.onClicks.put(identifier, onClick);
+            } else {
+                form.onClicks.put(identifier, () -> {
+                });
+            }
 
             Dimension size = new Dimension(250, 50);
             button.setPreferredSize(size);

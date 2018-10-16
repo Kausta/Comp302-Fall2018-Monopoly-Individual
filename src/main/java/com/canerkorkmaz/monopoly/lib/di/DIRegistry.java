@@ -1,10 +1,12 @@
 package com.canerkorkmaz.monopoly.lib.di;
 
-import com.canerkorkmaz.monopoly.data.model.ConnectionData;
-import com.canerkorkmaz.monopoly.data.model.LocalPlayerData;
+import com.canerkorkmaz.monopoly.data.data.ConnectionData;
+import com.canerkorkmaz.monopoly.data.data.LocalPlayerData;
+import com.canerkorkmaz.monopoly.data.data.PlayerData;
 import com.canerkorkmaz.monopoly.data.socket.SocketConnection;
 import com.canerkorkmaz.monopoly.domain.service.ConnectionRepository;
 import com.canerkorkmaz.monopoly.domain.service.LocalPlayerRepository;
+import com.canerkorkmaz.monopoly.domain.service.PlayerRepository;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
 import com.canerkorkmaz.monopoly.lib.event.EventFactory;
 import com.canerkorkmaz.monopoly.lib.logger.DefaultLoggerFactory;
@@ -26,11 +28,13 @@ public class DIRegistry {
         // Data Models ( these are singleton because they represent some object that would normally be taken from storage/db )
         registry.registerSingleton(LocalPlayerData.class);
         registry.registerSingleton(ConnectionData.class);
+        registry.registerSingleton(PlayerData.class);
         registry.registerSingleton(SocketConnection.class);
         // Services
         registry.register(LocalPlayerRepository.class);
         registry.register(ConnectionRepository.class);
+        registry.register(PlayerRepository.class);
         // Resource Loaders
-        registry.registerSingleton(MonopolyImageLoader.class );
+        registry.registerSingleton(MonopolyImageLoader.class);
     }
 }

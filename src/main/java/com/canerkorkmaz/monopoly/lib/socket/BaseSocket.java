@@ -7,6 +7,7 @@ import com.canerkorkmaz.monopoly.lib.threading.NamedThreadScheduler;
 public abstract class BaseSocket {
     private final NamedThreadScheduler scheduler;
     private CommandDispatcher dispatcher;
+    private boolean gameStarted = false;
 
     @Injected
     public BaseSocket(String name, CommandDispatcher dispatcher) {
@@ -24,5 +25,13 @@ public abstract class BaseSocket {
 
     public CommandDispatcher getDispatcher() {
         return dispatcher;
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    public void setGameStarted(boolean gameStarted) {
+        this.gameStarted = gameStarted;
     }
 }

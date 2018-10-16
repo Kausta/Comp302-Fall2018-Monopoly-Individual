@@ -1,6 +1,5 @@
 package com.canerkorkmaz.monopoly.view.resources;
 
-import com.canerkorkmaz.monopoly.Application;
 import com.canerkorkmaz.monopoly.constants.Configuration;
 
 import javax.imageio.ImageIO;
@@ -28,11 +27,11 @@ public class MonopolyImageLoader {
 
         if (y == 0) {
             return x;
-        } else if(y == 5) {
+        } else if (y == 5) {
             return 15 - x;
-        } else if(x == 0) {
+        } else if (x == 0) {
             return 20 - y;
-        } else if(x == 5) {
+        } else if (x == 5) {
             return 5 + y;
         } else {
             return null;

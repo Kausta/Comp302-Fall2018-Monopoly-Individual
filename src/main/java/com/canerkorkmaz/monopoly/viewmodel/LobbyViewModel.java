@@ -1,11 +1,13 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
-import com.canerkorkmaz.monopoly.data.model.LocalPlayerData;
+import com.canerkorkmaz.monopoly.data.data.LocalPlayerData;
+import com.canerkorkmaz.monopoly.domain.command.ClosedCommand;
+import com.canerkorkmaz.monopoly.domain.command.StartCommand;
+import com.canerkorkmaz.monopoly.domain.data.InitialPlayerData;
 import com.canerkorkmaz.monopoly.domain.data.PlayerNameData;
 import com.canerkorkmaz.monopoly.domain.service.ConnectionRepository;
+import com.canerkorkmaz.monopoly.domain.service.PlayerRepository;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
-import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
-import com.canerkorkmaz.monopoly.lib.command.StartCommand;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.event.Event;
 import com.canerkorkmaz.monopoly.lib.event.EventFactory;
@@ -16,11 +18,13 @@ import com.canerkorkmaz.monopoly.lib.typing.Unit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class LobbyViewModel {
     private final Logger logger;
     private final LocalPlayerData configuration;
     private final ConnectionRepository connectionRepository;
+    private final PlayerRepository playerRepository;
     private final UIEvent<Boolean> successOrFailure;
     private final UIEvent<ArrayList<String>> userNamesChanged;
     private final Event<Unit> startGame;
@@ -30,10 +34,12 @@ public class LobbyViewModel {
     public LobbyViewModel(ILoggerFactory logger,
                           LocalPlayerData configuration,
                           ConnectionRepository connectionRepository,
+                          PlayerRepository playerRepository,
                           EventFactory eventFactory) {
         this.logger = logger.createLogger(LobbyViewModel.class);
         this.configuration = configuration;
         this.connectionRepository = connectionRepository;
+        this.playerRepository = playerRepository;
         this.successOrFailure = eventFactory.createUIEvent();
         this.userNamesChanged = eventFactory.createUIEvent();
         this.startGame = eventFactory.createVMEvent();
@@ -51,7 +57,10 @@ public class LobbyViewModel {
             connectionRepository.sendRemote(new PlayerNameData(Arrays.asList(configuration.getLocalPlayerNames())));
         }
         startGame.subscribe((unit) -> {
-            connectionRepository.sendRemote(new StartCommand());
+            List<InitialPlayerData> playerData = playerRepository.initPlayerData(playerNames);
+            connectionRepository.sendRemote(new StartCommand(playerData));
+            playerRepository.initPlayersFromData(playerData);
+            connectionRepository.setGameStarted(true);
             this.successOrFailure.trigger(true);
         });
     }
@@ -66,6 +75,9 @@ public class LobbyViewModel {
                 userNamesChanged.trigger(this.playerNames);
                 break;
             case StartCommand.IDENTIFIER:
+                List<InitialPlayerData> startData = ((StartCommand) command).getStartData();
+                connectionRepository.setGameStarted(true);
+                playerRepository.initPlayersFromData(startData);
                 successOrFailure.trigger(true);
                 return true;
             case ClosedCommand.IDENTIFIER:
@@ -82,7 +94,19 @@ public class LobbyViewModel {
         switch (command.getIdentifier()) {
             case PlayerNameData.IDENTIFIER:
                 PlayerNameData data = (PlayerNameData) command;
-                playerNames.addAll(data.getPlayerNames());
+                List<String> newPlayerNames = data.getPlayerNames();
+                for (String newPlayer : newPlayerNames) {
+                    String name = newPlayer;
+                    if (playerNames.contains(newPlayer)) {
+                        for (int i = 1; ; i++) {
+                            if (!playerNames.contains(newPlayer + i)) {
+                                break;
+                            }
+                            name = newPlayer + i;
+                        }
+                    }
+                    playerNames.add(name);
+                }
                 userNamesChanged.trigger(this.playerNames);
                 // So that no one can join now, as we're interested in one master one client only
                 connectionRepository.setGameStarted(true);

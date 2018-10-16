@@ -1,6 +1,6 @@
 package com.canerkorkmaz.monopoly.domain.service;
 
-import com.canerkorkmaz.monopoly.data.model.LocalPlayerData;
+import com.canerkorkmaz.monopoly.data.data.LocalPlayerData;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;

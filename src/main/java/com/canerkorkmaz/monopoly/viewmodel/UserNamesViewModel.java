@@ -37,7 +37,7 @@ public class UserNamesViewModel {
         for (int i = 0; i < names.length; i++) {
             if (names[i] == null) {
                 //names[i] = "Player " + i;
-                names[i] = UUID.randomUUID().toString();
+                names[i] = UUID.randomUUID().toString().substring(0, 6);
             }
         }
         return names;

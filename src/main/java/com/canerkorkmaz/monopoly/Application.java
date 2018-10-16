@@ -1,6 +1,5 @@
 package com.canerkorkmaz.monopoly;
 
-import com.canerkorkmaz.monopoly.constants.LogLevel;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
 import com.canerkorkmaz.monopoly.lib.di.DI;
 import com.canerkorkmaz.monopoly.lib.di.DIRegistry;

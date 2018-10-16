@@ -1,4 +1,4 @@
-package com.canerkorkmaz.monopoly.data.model;
+package com.canerkorkmaz.monopoly.data.data;
 
 public class LocalPlayerData {
     private int numLocalPlayers;
