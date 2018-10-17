@@ -3,9 +3,7 @@ package com.canerkorkmaz.monopoly.lib.socket;
 import com.canerkorkmaz.monopoly.domain.data.ClientData;
 import com.canerkorkmaz.monopoly.domain.service.ConnectionRepository;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
-import com.canerkorkmaz.monopoly.lib.command.ClosedCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
-import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
@@ -52,42 +50,13 @@ public class FollowerSocket extends BaseSocket {
 
     @Override
     protected void onRun() {
-        try {
-            Object obj = inputStream.readObject();
-            if (obj == null) {
-                logger.i("Closing connection!");
-                getDispatcher().sendCommand(new ClosedCommand());
-                return;
-            }
-            if (!(obj instanceof RemoteCommand)) {
-                throw new RuntimeException("Received incorrect object");
-            }
-            RemoteCommand remoteCommand = (RemoteCommand) obj;
-            logger.i("Received " + remoteCommand.toString());
-            getDispatcher().sendCommand(remoteCommand.getInnerCommand());
-        } catch (Exception e) {
-            logger.e("Received incorrect object: " + e.getMessage());
-            if (e.getMessage().equalsIgnoreCase("Connection reset")) {
-                getDispatcher().sendCommand(new ClosedCommand());
-                return;
-            }
+        if (SocketCommandDispatcher.receiveCommandFromSocket(socket, getDispatcher(), logger, inputStream)) {
+            return;
         }
         this.run();
     }
 
     private void send(BaseCommand command) {
-        try {
-            if (command instanceof ClosedCommand) {
-                socket.close();
-                return;
-            }
-            if (!(command instanceof RemoteCommand)) {
-                return;
-            }
-            logger.i("Sending " + command.toString());
-            outputStream.writeObject(command);
-        } catch (IOException e) {
-            logger.e("Cannot send object: " + e.getMessage());
-        }
+        SocketCommandDispatcher.sendCommandToSocket(command, socket, logger, outputStream);
     }
 }

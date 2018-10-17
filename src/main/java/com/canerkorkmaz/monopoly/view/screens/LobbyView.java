@@ -2,6 +2,8 @@ package com.canerkorkmaz.monopoly.view.screens;
 
 import com.canerkorkmaz.monopoly.constants.Colors;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
+import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
+import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;
 import com.canerkorkmaz.monopoly.view.components.Form;
 import com.canerkorkmaz.monopoly.view.components.TitleLabel;
@@ -13,10 +15,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class LobbyView extends CenteredNavigationView {
+    private Logger logger;
     private LobbyViewModel viewModel;
 
     @Injected
-    public LobbyView(LobbyViewModel viewModel) {
+    public LobbyView(ILoggerFactory loggerFactory, LobbyViewModel viewModel) {
+        this.logger = loggerFactory.createLogger(LobbyView.class);
         this.viewModel = viewModel;
     }
 
@@ -37,6 +41,7 @@ public class LobbyView extends CenteredNavigationView {
     }
 
     private void draw(ArrayList<String> userNames) {
+        logger.i("Redrawing lobby with new players");
         final Form.Builder formBuilder = new Form.Builder()
                 .setBackgroundColor(Colors.BACKGROUND_COLOR)
                 .addComponent(new TitleLabel("Lobby", false))

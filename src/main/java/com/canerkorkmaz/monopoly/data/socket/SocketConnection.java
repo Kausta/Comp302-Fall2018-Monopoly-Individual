@@ -5,6 +5,8 @@ import com.canerkorkmaz.monopoly.lib.socket.BaseSocket;
 
 public class SocketConnection {
     private BaseSocket socket = null;
+    // One client
+    private boolean clientConnected = false;
 
     @Injected
     public SocketConnection() {
@@ -17,5 +19,16 @@ public class SocketConnection {
 
     public void setSocket(BaseSocket socket) {
         this.socket = socket;
+    }
+
+    public boolean isClientConnected() {
+        return clientConnected;
+    }
+
+    public void setClientConnected(boolean clientConnected) {
+        this.clientConnected = clientConnected;
+        if(socket != null) {
+            socket.setGameStarted(clientConnected);
+        }
     }
 }
