@@ -90,6 +90,9 @@ public class Form implements ActionListener {
         }
 
         public Builder addLabeledText(String labelText, String text) {
+            return addLabeledText(labelText, text, backgroundColor);
+        }
+        public Builder addLabeledText(String labelText, String text, Color backgroundColor) {
             JPanel container = new JPanel();
             GridBagLayout layout = new GridBagLayout();
             container.setLayout(layout);
@@ -116,7 +119,6 @@ public class Form implements ActionListener {
 
             return this;
         }
-
         public Builder addButton(String text, Runnable onClick) {
             return this.addButton(text, onClick, true);
         }

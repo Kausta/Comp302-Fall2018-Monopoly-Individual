@@ -1,8 +1,12 @@
 package com.canerkorkmaz.monopoly.data.model;
 
 import java.awt.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PlayerModel {
+public class PlayerModel implements Serializable {
+    private static final long serialVersionUID = 1L;
     // Name and color
     private String playerName;
     private Color playerColor;
@@ -20,6 +24,14 @@ public class PlayerModel {
     private boolean shouldRollAgain = false;
     private String rollAgainMessage = null;
     private boolean nextTurnReverse = false;
+    private boolean shouldSqueeze = false;
+    private boolean shouldRollOnce = false;
+    private int rollOnceRoll = 0;
+    private List<PropertyTileModel> tiles = new ArrayList<>();
+    private boolean canBuyProperty = false;
+    private PropertyTileModel buyableProperty = null;
+    private String message = null;
+
 
     public PlayerModel(String playerName, double money, Color playerColor, int origin) {
         this.playerName = playerName;
@@ -137,5 +149,57 @@ public class PlayerModel {
 
     public String getRollAgainMessage() {
         return rollAgainMessage;
+    }
+
+    public boolean isShouldSqueeze() {
+        return shouldSqueeze;
+    }
+
+    public void setShouldSqueeze(boolean shouldSqueeze) {
+        this.shouldSqueeze = shouldSqueeze;
+    }
+
+    public boolean isShouldRollOnce() {
+        return shouldRollOnce;
+    }
+
+    public void setShouldRollOnce(boolean shouldRollOnce) {
+        this.shouldRollOnce = shouldRollOnce;
+    }
+
+    public int getRollOnceRoll() {
+        return rollOnceRoll;
+    }
+
+    public void setRollOnceRoll(int rollOnceRoll) {
+        this.rollOnceRoll = rollOnceRoll;
+    }
+
+    public List<PropertyTileModel> getTiles() {
+        return tiles;
+    }
+
+    public boolean isCanBuyProperty() {
+        return this.canBuyProperty;
+    }
+
+    public void setCanBuyProperty(boolean canBuyProperty) {
+        this.canBuyProperty = canBuyProperty;
+    }
+
+    public PropertyTileModel getBuyableProperty() {
+        return buyableProperty;
+    }
+
+    public void setBuyableProperty(PropertyTileModel buyableProperty) {
+        this.buyableProperty = buyableProperty;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

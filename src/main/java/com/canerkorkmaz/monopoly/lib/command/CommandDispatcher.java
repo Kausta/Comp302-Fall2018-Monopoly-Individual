@@ -33,7 +33,7 @@ public class CommandDispatcher {
             try {
                 BaseCommand command = commands.take();
                 logger.i("Got command " + command.toString());
-                logger.i("Starting handling with " + commandFns.size());
+                logger.d("Starting handling with " + commandFns.size());
                 Iterator<Function<BaseCommand, Boolean>> it = commandFns.iterator();
                 while (it.hasNext()) {
                     Function<BaseCommand, Boolean> holder = it.next();
@@ -42,7 +42,7 @@ public class CommandDispatcher {
                         it.remove();
                     }
                 }
-                logger.i("Finished with " + commandFns.size());
+                logger.d("Finished with " + commandFns.size());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return;

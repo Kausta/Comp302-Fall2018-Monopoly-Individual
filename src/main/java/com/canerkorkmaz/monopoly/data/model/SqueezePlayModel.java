@@ -6,4 +6,9 @@ public class SqueezePlayModel extends TileModel {
     public SqueezePlayModel() {
         super(TileType.SQUEEZE_PLAY);
     }
+
+    @Override
+    public void handleLand(PlayerModel model) {
+        model.setShouldSqueeze(true);
+    }
 }

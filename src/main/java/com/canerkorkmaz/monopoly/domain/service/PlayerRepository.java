@@ -100,7 +100,18 @@ public class PlayerRepository {
     }
 
     public boolean isFromThisClient(PlayerModel model) {
-        logger.i("" + model.getOrigin() + " == " + connectionRepository.getOrigin());
         return model.getOrigin() == connectionRepository.getOrigin();
+    }
+
+    public void transerMoneyFromEveryone(PlayerModel model, int money) {
+        final Map<String, PlayerModel> playerList = playerData.getPlayerList();
+        for(String playerName: playerList.keySet()) {
+            if(playerName.equals(model.getPlayerName())) {
+                continue;
+            }
+            PlayerModel other = playerList.get(playerName);
+            other.setMoney(other.getMoney() - money);
+            model.setMoney(model.getMoney() + money);
+        }
     }
 }

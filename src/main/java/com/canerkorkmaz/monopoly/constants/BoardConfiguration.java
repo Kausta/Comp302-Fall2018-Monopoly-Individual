@@ -5,14 +5,15 @@ import com.canerkorkmaz.monopoly.data.model.*;
 import java.awt.*;
 
 public final class BoardConfiguration {
-    private BoardConfiguration() {}
+    private BoardConfiguration() {
+    }
 
     public static Color BLUE = new Color(0x87, 0xA5, 0xD7);
     public static Color PINK = new Color(0xEF, 0x38, 0x78);
     public static Color ORANGE = new Color(0xF5, 0x80, 0x23);
     public static Color GREEN = new Color(0x09, 0x87, 0x33);
 
-    public static TileModel[] tileTypes = new TileModel[] {
+    public static TileModel[] tileTypes = new TileModel[]{
             new FreeParkingModel(),
             new PropertyTileModel(ORANGE, "St. James Place", 180),
             new KocSquareModel(),
@@ -34,4 +35,16 @@ public final class BoardConfiguration {
             new PropertyTileModel(PINK, "States Ave", 140),
             new PropertyTileModel(PINK, "Virginia Ave", 160),
     };
+
+    public static PropertyTileModel getPropertyTileModel(PropertyTileModel p) {
+        for (TileModel model : tileTypes) {
+            if (model instanceof PropertyTileModel) {
+                PropertyTileModel propertyTileModel = (PropertyTileModel) model;
+                if(propertyTileModel.equals(p)) {
+                    return propertyTileModel;
+                }
+            }
+        }
+        return p;
+    }
 }

@@ -2,6 +2,7 @@ package com.canerkorkmaz.monopoly.view.screens;
 
 import com.canerkorkmaz.monopoly.constants.Colors;
 import com.canerkorkmaz.monopoly.data.model.PlayerModel;
+import com.canerkorkmaz.monopoly.data.model.PropertyTileModel;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
 import com.canerkorkmaz.monopoly.lib.logger.Logger;
@@ -21,11 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameView extends NavigationView {
-    private static final int NARROW = 110;
-    private static final int WIDE = 220;
-    private static final int GRID_NARROW = 110;
-    private static final int GRID_WIDE = 220;
-    private static final int PLAYER_SIZE = 40;
+    private int NARROW = 110;
+    private int WIDE = 220;
+    private int GRID_NARROW = 110;
+    private int GRID_WIDE = 220;
+    private int GAP = 10;
+    private int PLAYER_SIZE = 40;
     private static final int MS_PER_FRAME = 16;
     private static final int ANIMATION_TIME = 500;
 
@@ -45,7 +47,7 @@ public class GameView extends NavigationView {
     private JPanel monopolyPanel;
     private MonopolyBoxHolder[] monopolyBoxes;
     private JPanel playerList;
-    private Map<String, JPanel> playerPanels;
+    private Map<String, JScrollPane> playerPanels;
     private Map<String, JPanel> playerImages;
 
     private Dimension size;
@@ -72,12 +74,16 @@ public class GameView extends NavigationView {
         viewModel.getCloseApplication().subscribe(unit ->
                 this.getNavigator().exitApplication());
         viewModel.getRedrawPanel().subscribe(x -> {
-                this.populatePlayer(x);
-                if(started) {
-                    this.drawMenu(x);
-                } else {
-                    this.drawOrderRollMenu(x);
-                }
+            if (x == null) {
+                this.populatePlayers();
+            }
+            x = viewModel.getCurrentPlayer();
+            this.populatePlayer(x);
+            if (started) {
+                this.drawMenu(x);
+            } else {
+                this.drawOrderRollMenu(x);
+            }
         });
         viewModel.getEndOrderTurn().subscribe(finished -> {
             if (finished) {
@@ -93,7 +99,8 @@ public class GameView extends NavigationView {
         viewModel.getPlayerMove().subscribe(change -> {
             PlayerModel model = viewModel.getCurrentPlayer();
             int location = model.getLocation();
-            int newLocation = (model.getLocation() + change) % 20;
+            // Guarantee positiveness
+            int newLocation = ((model.getLocation() + change) % 20 + 20) % 20;
             model.setLocation(newLocation);
             drawMenu(model);
             populatePlayer(model);
@@ -111,11 +118,12 @@ public class GameView extends NavigationView {
 
     private void drawUI() {
         size = this.getNavigator().getSize();
-        leftWidth = (size.width * 4) / 7 - 6;
-        rightWidth = (size.width * 3) / 7 - 6;
+        leftWidth = (size.width * 4) / 7 - 10;
+        rightWidth = (size.width * 3) / 7 - 10;
         height = size.height - 10;
 
         monopolyBoxes = new MonopolyBoxHolder[20];
+        scale(Math.min(size.getWidth() / 1920, size.getHeight() / 1080));
 
         left = new JPanel();
         left.setPreferredSize(new Dimension(leftWidth, height));
@@ -130,11 +138,12 @@ public class GameView extends NavigationView {
         right.setBackground(Colors.BACKGROUND_COLOR);
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
         right.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        right.setPreferredSize(new Dimension(rightWidth, height));
 
-        JPanel leftTop = new JPanel();
-        leftTop.setBackground(Colors.BACKGROUND_COLOR);
-        leftTop.setLayout(new BorderLayout());
-        leftTop.setPreferredSize(new Dimension(rightWidth - 5, 2 * height / 3 - 2));
+        JPanel rightTop = new JPanel();
+        rightTop.setBackground(Colors.BACKGROUND_COLOR);
+        rightTop.setLayout(new BorderLayout());
+        rightTop.setPreferredSize(new Dimension(rightWidth - 5, 2 * height / 3 - 2));
 
         playerList = new JPanel();
         playerList.setLayout(new BoxLayout(playerList, BoxLayout.Y_AXIS));
@@ -146,8 +155,8 @@ public class GameView extends NavigationView {
         JScrollPane playerPane = new JScrollPane(playerList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         playerPane.setBackground(Colors.BACKGROUND_COLOR);
 
-        leftTop.add(playerPane, BorderLayout.CENTER);
-        right.add(leftTop);
+        rightTop.add(playerPane, BorderLayout.CENTER);
+        right.add(rightTop);
         right.add(Box.createVerticalStrut(4));
 
         drawOrderRollMenu(viewModel.getCurrentPlayer());
@@ -163,18 +172,11 @@ public class GameView extends NavigationView {
         rootPane.setBackground(Colors.BACKGROUND_COLOR);
         rootPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        right.setPreferredSize(new Dimension(rightWidth, height));
-
         rootPane.add(left);
         rootPane.add(Box.createHorizontalStrut(2));
         rootPane.add(right);
 
-        overlayPane = new JPanel(null);
-        overlayPane.add(rootPane);
-
-        rootPane.setBounds(0, 0, size.width, size.height);
-        overlayPane.setBounds(0, 0, size.width, size.height);
-
+        overlayPane = rootPane;
     }
 
     private JPanel getMonopolySquare(int x, int y, int width, int height) {
@@ -186,7 +188,7 @@ public class GameView extends NavigationView {
             if (image == null) {
                 throw new IOException("Image not found");
             }
-            JLabel picture = new JLabel(new ImageIcon(image));
+            JLabel picture = new JLabel(new ImageIcon(image.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
             picture.setMinimumSize(new Dimension(width, height));
             square.add(picture, new GridBagConstraintsBuilder().setWeightX(1.).setWeightY(1.).build());
         } catch (IOException e) {
@@ -251,24 +253,23 @@ public class GameView extends NavigationView {
             row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
             for (int j = 0; j < 3 && i + j < players.size(); j++) {
                 PlayerModel player = players.get(i + j);
-                JPanel playerPanel = populatePlayer(player);
+                JScrollPane playerPanel = populatePlayer(player);
                 row.add(playerPanel);
             }
             playerList.add(row);
         }
     }
 
-    private JPanel populatePlayer(PlayerModel player) {
+    private JScrollPane populatePlayer(PlayerModel player) {
         boolean currentPlayer = viewModel.isActivePlayer(player);
 
         String name = player.getPlayerName();
-        JPanel outer = playerPanels.get(name);
+        JScrollPane outer = playerPanels.get(name);
         if (outer == null) {
-            outer = new JPanel();
+            outer = new JScrollPane();
             outer.setPreferredSize(new Dimension(rightWidth / 4, height / 4));
             outer.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         }
-        outer.removeAll();
         Form.Builder builder = new Form.Builder()
                 .addLabeledText("Player ", player.getPlayerName());
         if (!player.isActive()) {
@@ -281,16 +282,19 @@ public class GameView extends NavigationView {
         if (viewModel.isRolled(player)) {
             builder.addLabeledText("Initial Roll: ", "" + player.getInitialRollString());
         }
-        JPanel panel = builder
-                .addLabeledText("Money: ", "" + player.getMoney())
-                .build()
+        builder.addLabeledText("Money: ", "" + player.getMoney());
+        for (PropertyTileModel property : player.getTiles()) {
+            builder.addLabeledText("Property: ", property.getName(), property.getColor());
+        }
+        JPanel panel = builder.build()
                 .getContent();
         Color bg = currentPlayer ? player.getBackgroundColor() : player.getPlayerColor();
         panel.setBackground(bg);
         outer.setBackground(bg);
-        outer.add(panel);
+        outer.setViewportView(panel);
         playerPanels.put(name, outer);
-        redrawComponent(outer);
+        outer.revalidate();
+        outer.repaint();
         return outer;
     }
 
@@ -323,19 +327,36 @@ public class GameView extends NavigationView {
     private JPanel getMenu(PlayerModel model) {
         boolean isCurrentUser = viewModel.isFromThisClient(model);
         Form.Builder builder = new Form.Builder();
-        if (!viewModel.rolledThisTurn(model) || model.shouldRollAgain()) {
-            builder.addLabeledText("Turn of: ", model.getPlayerName());
-            if(model.shouldRollAgain()) {
+        builder.addLabeledText("Turn of: ", model.getPlayerName());
+        boolean finished = false;
+        if (model.isShouldSqueeze()) {
+            builder.addLabeledText("Rolled: ", model.getRollString());
+            builder.addButton("Squeeze", viewModel::dispatchSqueeze, isCurrentUser && !isAnimating);
+        } else if (model.isShouldRollOnce()) {
+            builder.addLabeledText("Rolled: ", model.getRollString());
+            builder.addLabeledText("Roll Once Card:", "" + model.getRollOnceRoll());
+            builder.addButton("Roll Once", viewModel::dispatchRollOnce, isCurrentUser && !isAnimating);
+        } else if (!viewModel.rolledThisTurn(model) || model.shouldRollAgain()) {
+            if (model.shouldRollAgain()) {
                 builder.addLabeledText("Roll: ", model.getRollAgainMessage());
             }
-            if(model.getNextTurnReverse()) {
+            if (model.getNextTurnReverse()) {
                 builder.addLabeledText("You are going reverse this turn", ":(");
             }
             builder.addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !isAnimating && !viewModel.isRolled(model));
         } else {
-            builder.addLabeledText("Turn of: ", model.getPlayerName())
-                    .addLabeledText("Rolled: ", model.getRollString())
-                    .addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser && !isAnimating);
+            builder.addLabeledText("Rolled: ", model.getRollString());
+            finished = true;
+        }
+        if (model.isCanBuyProperty()) {
+            builder.addButton("Buy Property for " + model.getBuyableProperty().getPrice(), viewModel::dispatchBuyProperty, isCurrentUser && !isAnimating);
+        }
+        if (finished) {
+            String message = model.getMessage();
+            if (message != null) {
+                builder.addLabeledText("Result: ", message);
+            }
+            builder.addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser && !isAnimating);
         }
         return builder.build().getContent();
     }
@@ -404,11 +425,11 @@ public class GameView extends NavigationView {
         int xOffset;
         int yOffset;
         if ((location >= 0 && location <= 5) || (location >= 10 && location <= 15)) {
-            xOffset = 10 + (order / 4) * (PLAYER_SIZE + 10);
-            yOffset = 10 + (order % 4) * (PLAYER_SIZE + 10);
+            xOffset = GAP + (order / 4) * (PLAYER_SIZE + GAP);
+            yOffset = GAP + (order % 4) * (PLAYER_SIZE + GAP);
         } else {
-            yOffset = 10 + (order / 4) * (PLAYER_SIZE + 10);
-            xOffset = 10 + (order % 4) * (PLAYER_SIZE + 10);
+            yOffset = GAP + (order / 4) * (PLAYER_SIZE + GAP);
+            xOffset = GAP + (order % 4) * (PLAYER_SIZE + GAP);
         }
 
         return new Point(x + xOffset, y + yOffset);
@@ -418,7 +439,7 @@ public class GameView extends NavigationView {
         JPanel playerBox = playerImages.get(model.getPlayerName());
         if (!isReverse && toLocation < fromLocation) {
             toLocation += 20;
-        } else if(isReverse && toLocation > fromLocation) {
+        } else if (isReverse && toLocation > fromLocation) {
             toLocation -= 20;
         }
         isAnimating = true;
@@ -434,14 +455,14 @@ public class GameView extends NavigationView {
             viewModel.dispatchEndMovement();
             return;
         }
-        if(animationIndex != 0) {
-            viewModel.dispatchHandlePass(fromLocation % 20);
+        if (animationIndex != 0) {
+            viewModel.dispatchHandlePass((fromLocation + 20) % 20);
         }
         final int nextLocation = (fromLocation + (isReverse ? -1 : 1) + 20) % 20;
         final long start = System.currentTimeMillis();
         final Point from = getPosition((fromLocation + 20) % 20, model.getOrder());
         final Point to = getPosition(nextLocation, model.getOrder());
-        final Timer timer = new Timer(16, null);
+        final Timer timer = new Timer(MS_PER_FRAME, null);
         animationProgress = 0.0;
         timer.addActionListener((event) -> {
             long elapsed = System.currentTimeMillis() - start;
@@ -464,6 +485,15 @@ public class GameView extends NavigationView {
         Point p = new Point();
         p.setLocation(first.x * (1 - distance) + (second.x * distance), first.y * (1 - distance) + second.y * distance);
         return p;
+    }
+
+    private void scale(double scale) {
+        this.GRID_NARROW = (int) (GRID_NARROW * scale);
+        this.GRID_WIDE = (int) (GRID_WIDE * scale);
+        this.PLAYER_SIZE = (int) (PLAYER_SIZE * scale);
+        this.GAP = (int) (GAP * scale);
+        this.WIDE = (int) (WIDE * scale);
+        this.NARROW = (int) (NARROW * scale);
     }
 
 }

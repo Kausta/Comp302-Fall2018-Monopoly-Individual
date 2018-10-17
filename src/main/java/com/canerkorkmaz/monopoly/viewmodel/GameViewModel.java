@@ -1,6 +1,8 @@
 package com.canerkorkmaz.monopoly.viewmodel;
 
+import com.canerkorkmaz.monopoly.constants.BoardConfiguration;
 import com.canerkorkmaz.monopoly.data.model.PlayerModel;
+import com.canerkorkmaz.monopoly.data.model.PropertyTileModel;
 import com.canerkorkmaz.monopoly.domain.command.*;
 import com.canerkorkmaz.monopoly.domain.service.BoardRepository;
 import com.canerkorkmaz.monopoly.domain.service.PlayerRepository;
@@ -89,7 +91,11 @@ public class GameViewModel {
                 playerMove.trigger((player.getNextTurnReverse() ? -1 : 1) * player.getRoll());
                 break;
             case EndTurnCommand.IDENTIFIER:
-                getCurrentPlayer().setRoll(0, 0);
+                PlayerModel currentPlayer = getCurrentPlayer();
+                currentPlayer.setRoll(0, 0);
+                currentPlayer.setMessage(null);
+                currentPlayer.setCanBuyProperty(false);
+                currentPlayer.setBuyableProperty(null);
                 this.currentPlayerIndex = (((EndTurnCommand) command).getPlayerIndex() + 1) % this.playerRepository.getPlayerCount();
                 endTurn.trigger(Unit.INSTANCE);
                 break;
@@ -98,14 +104,53 @@ public class GameViewModel {
                 redrawPanel.trigger(getCurrentPlayer());
                 break;
             case EndMovementCommand.IDENTIFIER:
-                PlayerModel currentPlayer = getCurrentPlayer();
+                currentPlayer = getCurrentPlayer();
                 // Reset some of the state
-                if(currentPlayer.getNextTurnReverse()) {
-                    currentPlayer.setNextTurnReverse(false);
-                }
+                currentPlayer.setNextTurnReverse(false);
 
                 boardRepository.handleTileLand(currentPlayer, currentPlayer.getLocation());
                 redrawPanel.trigger(currentPlayer);
+                break;
+            case BuyPropertyCommand.IDENTIFIER:
+                currentPlayer = getCurrentPlayer();
+                PropertyTileModel propertyCopy = ((BuyPropertyCommand) command).getProperty();
+                PropertyTileModel property = BoardConfiguration.getPropertyTileModel(propertyCopy);
+                property.setBought(true);
+                currentPlayer.setCanBuyProperty(false);
+                currentPlayer.setBuyableProperty(null);
+                currentPlayer.getTiles().add(property);
+                currentPlayer.setMoney(currentPlayer.getMoney() - property.getPrice());
+                redrawPanel.trigger(currentPlayer);
+                break;
+            case RollOnceCommand.IDENTIFIER:
+                RollOnceCommand rollOnceCommand = (RollOnceCommand) command;
+                if(rollOnceCommand.getCardRoll() == rollOnceCommand.getPlayerRoll()) {
+                    getCurrentPlayer().setMoney(getCurrentPlayer().getMoney() + 100);
+                    getCurrentPlayer().setMessage("" + rollOnceCommand.getPlayerRoll() + " is " + rollOnceCommand.getCardRoll() + ", you got 100$" );
+                } else {
+                    getCurrentPlayer().setMessage("" + rollOnceCommand.getPlayerRoll() + " is not " + rollOnceCommand.getCardRoll() + ", no money");
+                }
+                getCurrentPlayer().setShouldRollOnce(false);
+                getCurrentPlayer().setRollOnceRoll(0);
+                redrawPanel.trigger(getCurrentPlayer());
+                break;
+            case SqueezeCommand.IDENTIFIER:
+                SqueezeCommand squeezeCommand = (SqueezeCommand) command;
+                int sum = squeezeCommand.getRoll1() + squeezeCommand.getRoll2();
+                int moneyToGet;
+                if(sum == 3 || sum == 4) {
+                    moneyToGet = 100;
+                } else if(sum == 10 || sum == 11) {
+                    moneyToGet = 100;
+                } else if(sum == 2 || sum == 12) {
+                    moneyToGet = 200;
+                } else {
+                    moneyToGet = 50;
+                }
+                getCurrentPlayer().setMessage("You squeezed " + squeezeCommand.getRoll1() + "+" + squeezeCommand.getRoll2() + "=" + sum + ", you collect " + moneyToGet + "$");
+                playerRepository.transerMoneyFromEveryone(getCurrentPlayer(), moneyToGet);
+                redrawPanel.trigger(getCurrentPlayer());
+                getCurrentPlayer().setShouldSqueeze(false);
                 break;
             default:
                 logger.w("Didn't expect command: " + command.toString());
@@ -125,7 +170,7 @@ public class GameViewModel {
     }
 
     public boolean isActivePlayer(PlayerModel playerModel) {
-        return getCurrentPlayer().getPlayerName().equals(playerModel.getPlayerName());
+        return currentPlayerIndex == playerModel.getOrder();
     }
 
     public boolean isFromThisClient(PlayerModel playerModel) {
@@ -163,6 +208,18 @@ public class GameViewModel {
 
     public void dispatchEndMovement() {
         dispatcher.sendCommand(new RemoteCommand(new EndMovementCommand()));
+    }
+
+    public void dispatchBuyProperty() {
+        dispatcher.sendCommand(new BuyPropertyCommand(getCurrentPlayer().getBuyableProperty()));
+    }
+
+    public void dispatchRollOnce() {
+        dispatcher.sendCommand(new RollOnceCommand(1 + r.nextInt(6), getCurrentPlayer().getRollOnceRoll()));
+    }
+
+    public void dispatchSqueeze() {
+        dispatcher.sendCommand(new SqueezeCommand(1 + r.nextInt(6), 1 + r.nextInt(6)));
     }
 
     public UIEvent<PlayerModel> getRedrawPanel() {
