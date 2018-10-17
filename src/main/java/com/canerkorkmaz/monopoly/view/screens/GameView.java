@@ -14,6 +14,7 @@ import com.canerkorkmaz.monopoly.viewmodel.GameViewModel;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -23,13 +24,18 @@ import java.util.Map;
 public class GameView extends NavigationView {
     private static final int NARROW = 110;
     private static final int WIDE = 220;
-    private static final int GRID_NARROW = 11;
-    private static final int GRID_WIDE = 22;
-    private static final int PLAYER_SIZE = 4;
+    private static final int GRID_NARROW = 110;
+    private static final int GRID_WIDE = 220;
+    private static final int PLAYER_SIZE = 40;
+    private static final int MS_PER_FRAME = 16;
+    private static final int ANIMATION_TIME = 500;
 
     private final Logger logger;
     private final GameViewModel viewModel;
     private final MonopolyImageLoader loader;
+
+    private double animationProgress = 0.0;
+    private boolean isAnimating = false;
 
     private JPanel overlayPane;
     private JPanel rootPane;
@@ -78,10 +84,12 @@ public class GameView extends NavigationView {
         });
         viewModel.getPlayerMove().subscribe(change -> {
             PlayerModel model = viewModel.getCurrentPlayer();
-            model.setLocation((model.getLocation() + change) % 20);
+            int location = model.getLocation();
+            int newLocation = (model.getLocation() + change) % 20;
+            model.setLocation(newLocation);
             drawMenu(model);
             populatePlayer(model);
-            drawPlayer(model);
+            animatePlayer(model, location, newLocation);
         });
         viewModel.getEndTurn().subscribe(unit -> {
             drawMenu(viewModel.getCurrentPlayer());
@@ -102,6 +110,7 @@ public class GameView extends NavigationView {
         monopolyBoxes = new MonopolyBoxHolder[20];
 
         left = new JPanel();
+        left.setPreferredSize(new Dimension(leftWidth, height));
         left.setBackground(Colors.BACKGROUND_COLOR);
         left.setLayout(new BorderLayout());
         populateMonopoly();
@@ -146,7 +155,6 @@ public class GameView extends NavigationView {
         rootPane.setBackground(Colors.BACKGROUND_COLOR);
         rootPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        left.setPreferredSize(new Dimension(leftWidth, height));
         right.setPreferredSize(new Dimension(rightWidth, height));
 
         rootPane.add(left);
@@ -181,24 +189,29 @@ public class GameView extends NavigationView {
 
     private JPanel populateMonopoly() {
         monopolyPanel = new JPanel();
-        monopolyPanel.setLayout(new GridBagLayout());
+        monopolyPanel.setLayout(null);
         monopolyPanel.setBackground(Colors.BACKGROUND_COLOR);
+        Dimension dim = left.getPreferredSize();
+        monopolyPanel.setBounds(0, 0, (int)dim.getWidth(), (int)dim.getHeight());
+        double max_size = 2 * GRID_WIDE + 4 * GRID_NARROW;
+        int xOffset = (int)(dim.getWidth() / 2 - max_size / 2);
+        int yOffset = (int)(dim.getHeight() / 2 - max_size / 2);
         int pos = 0;
         int arrayIndex = 0;
         for (int i = 0; i < 6; i++) {
             boolean isCorner = (i % 5) == 0;
             int width = isCorner ? GRID_WIDE : GRID_NARROW;
-            JComponent component = getMonopolySquare(i, 0, isCorner ? WIDE : NARROW, WIDE);
-            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, pos, 0, width, GRID_WIDE);
+            JComponent component = getMonopolySquare(i, 0 , isCorner ? WIDE : NARROW, WIDE);
+            monopolyPanel.add(component);
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, xOffset + pos, yOffset, width, GRID_WIDE);
             monopolyBoxes[arrayIndex++] = holder;
-            monopolyPanel.add(component, holder.createConstraints());
             pos += width;
         }
         for (int i = 0; i < 4; i++) {
             JComponent component = getMonopolySquare(5, i + 1, WIDE, NARROW);
-            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + i * GRID_NARROW, GRID_WIDE, GRID_NARROW);
+            monopolyPanel.add(component);
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, xOffset + GRID_WIDE + 4 * GRID_NARROW, yOffset + GRID_WIDE + i * GRID_NARROW, GRID_WIDE, GRID_NARROW);
             monopolyBoxes[arrayIndex++] = holder;
-            monopolyPanel.add(component, holder.createConstraints());
         }
         pos = 0;
         for (int i = 0; i < 6; i++) {
@@ -206,22 +219,20 @@ public class GameView extends NavigationView {
             int width = isCorner ? GRID_WIDE : GRID_NARROW;
             pos += width;
             JComponent component = getMonopolySquare(5 - i, 5, isCorner ? WIDE : NARROW, WIDE);
-            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, 2 * GRID_WIDE + 4 * GRID_NARROW - pos, GRID_WIDE + 4 * GRID_NARROW, width, GRID_WIDE);
+            monopolyPanel.add(component);
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, xOffset + 2 * GRID_WIDE + 4 * GRID_NARROW - pos, yOffset + GRID_WIDE + 4 * GRID_NARROW, width, GRID_WIDE);
             monopolyBoxes[arrayIndex++] = holder;
-            monopolyPanel.add(component, holder.createConstraints());
         }
         for (int i = 3; i >= 0; i--) {
             JComponent component = getMonopolySquare(0, 5 - i - 1, WIDE, NARROW);
-            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, 0, GRID_WIDE + i * GRID_NARROW, GRID_WIDE, GRID_NARROW);
+            monopolyPanel.add(component);
+            MonopolyBoxHolder holder = new MonopolyBoxHolder(component, xOffset, yOffset + GRID_WIDE + i * GRID_NARROW, GRID_WIDE, GRID_NARROW);
             monopolyBoxes[arrayIndex++] = holder;
-            monopolyPanel.add(component, holder.createConstraints());
         }
         JPanel middle = new JPanel();
         middle.setBackground(Colors.BACKGROUND_COLOR);
-        monopolyPanel.add(middle, new GridBagConstraintsBuilder()
-                .setPosition(GRID_WIDE, GRID_WIDE)
-                .setSize(GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + 4 * GRID_NARROW)
-                .build());
+        monopolyPanel.add(middle);
+        MonopolyBoxHolder middleBox = new MonopolyBoxHolder(middle, xOffset + GRID_WIDE, yOffset + GRID_WIDE, GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + 4 * GRID_NARROW);
         return monopolyPanel;
     }
 
@@ -306,14 +317,14 @@ public class GameView extends NavigationView {
         if (!viewModel.rolledThisTurn(model)) {
             return new Form.Builder()
                     .addLabeledText("Turn of: ", model.getPlayerName())
-                    .addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !viewModel.isRolled(model))
+                    .addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !isAnimating && !viewModel.isRolled(model))
                     .build()
                     .getContent();
         } else {
             return new Form.Builder()
                     .addLabeledText("Turn of: ", model.getPlayerName())
                     .addLabeledText("Rolled: ", model.getRollString())
-                    .addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser)
+                    .addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser && !isAnimating)
                     .build()
                     .getContent();
         }
@@ -349,25 +360,11 @@ public class GameView extends NavigationView {
 
     private void drawPlayer(PlayerModel player) {
         int playerLocation = player.getLocation();
-        MonopolyBoxHolder panel = monopolyBoxes[playerLocation];
-        int x = panel.getGridX();
-        int y = panel.getGridY();
 
-        int location = player.getOrder();
-
-        int xOffset;
-        int yOffset;
-        if ((playerLocation >= 0 && playerLocation <= 5) || (playerLocation >= 10 && playerLocation <= 15)) {
-            yOffset = 1 + (location / 4) * (PLAYER_SIZE + 1);
-            xOffset = 1 + (location % 4) * (PLAYER_SIZE + 1);
-        } else {
-            xOffset = 1 + (location / 4) * (PLAYER_SIZE + 1);
-            yOffset = 1 + (location % 4) * (PLAYER_SIZE + 1);
-        }
-
+        Point offset = getPosition(playerLocation, player.getOrder());
         JPanel playerBox = playerImages.get(player.getPlayerName());
         if (playerBox == null) {
-            BufferedImage playerImage = new BufferedImage(40, 40, BufferedImage.TYPE_INT_RGB);
+            BufferedImage playerImage = new BufferedImage(PLAYER_SIZE,  PLAYER_SIZE, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics = playerImage.createGraphics();
 
             graphics.setPaint(player.getBackgroundColor());
@@ -378,21 +375,79 @@ public class GameView extends NavigationView {
             playerBox.add(new JLabel(new ImageIcon(playerImage)));
         }
 
-        monopolyPanel.remove(playerBox);
-        monopolyPanel.validate();
-
-        monopolyPanel.add(playerBox, new GridBagConstraintsBuilder()
-                .setPosition(x + yOffset, y + xOffset)
-                .setSize(PLAYER_SIZE, PLAYER_SIZE)
-                .build());
+        playerBox.setBounds(offset.x, offset.y, PLAYER_SIZE, PLAYER_SIZE);
+        monopolyPanel.add(playerBox);
         monopolyPanel.setComponentZOrder(playerBox, 0);
 
-        logger.i("Placing player at " + playerLocation + " to " + (x + xOffset) + ", " + (y + yOffset));
+        logger.i("Placing player at " + playerLocation + " to " + (offset.x) + ", " + (offset.y));
         playerImages.put(player.getPlayerName(), playerBox);
 
         monopolyPanel.validate();
-        monopolyPanel.repaint();
+        redrawComponent(monopolyPanel);
     }
 
+    private Point getPosition(int location, int order) {
+        MonopolyBoxHolder panel = monopolyBoxes[location];
+        int x = panel.getGridX();
+        int y = panel.getGridY();
+
+        int xOffset;
+        int yOffset;
+        if ((location >= 0 && location <= 5) || (location >= 10 && location <= 15)) {
+            xOffset = 10 + (order / 4) * (PLAYER_SIZE + 10);
+            yOffset = 10 + (order % 4) * (PLAYER_SIZE + 10);
+        } else {
+            yOffset = 10 + (order / 4) * (PLAYER_SIZE + 10);
+            xOffset = 10 + (order % 4) * (PLAYER_SIZE + 10);
+        }
+
+        return new Point(x + xOffset, y + yOffset);
+    }
+
+    private void animatePlayer(PlayerModel model, int fromLocation, int toLocation) {
+        JPanel playerBox = playerImages.get(model.getPlayerName());
+        if (toLocation < fromLocation) {
+            toLocation += 20;
+        }
+        isAnimating = true;
+        drawMenu(model);
+        animatePlayerImplementation(playerBox, model, fromLocation, toLocation);
+    }
+
+    private void animatePlayerImplementation(final JPanel playerBox, PlayerModel model, int fromLocation, int toLocation) {
+        if (fromLocation >= toLocation) {
+            isAnimating = false;
+            drawMenu(model);
+            drawPlayer(model);
+            return;
+        }
+        final long start = System.currentTimeMillis();
+        final Point from = getPosition(fromLocation % 20, model.getOrder());
+        final Point to = getPosition((fromLocation + 1) % 20, model.getOrder());
+        final Timer timer = new Timer(16, null);
+        animationProgress = 0.0;
+        timer.addActionListener((event) -> {
+            long elapsed = System.currentTimeMillis() - start;
+            animationProgress = (double) elapsed / ANIMATION_TIME;
+            Point loc = interpolate(from, to, animationProgress);
+            logger.i("Loc: " + loc);
+
+            playerBox.setBounds(loc.x, loc.y, PLAYER_SIZE, PLAYER_SIZE);
+            redrawComponent(monopolyPanel);
+
+            monopolyPanel.setComponentZOrder(playerBox, 0);
+            if (animationProgress >= 0.97f) {
+                timer.stop();
+                animatePlayerImplementation(playerBox, model, fromLocation + 1, toLocation);
+            }
+        });
+        timer.start();
+    }
+
+    private static Point interpolate(Point first, Point second, double distance) {
+        Point p = new Point();
+        p.setLocation(first.x * (1 - distance) + (second.x * distance), first.y * (1 - distance) + second.y * distance);
+        return p;
+    }
 
 }

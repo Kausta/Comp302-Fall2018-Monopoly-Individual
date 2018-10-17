@@ -18,6 +18,7 @@ public class MonopolyBoxHolder {
         this.gridY = gridY;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
+        this.setBounds();
     }
 
     public JComponent getMonopolyComponent() {
@@ -40,10 +41,7 @@ public class MonopolyBoxHolder {
         return gridHeight;
     }
 
-    public GridBagConstraints createConstraints() {
-        return new GridBagConstraintsBuilder()
-                .setPosition(gridX, gridY)
-                .setSize(gridWidth, gridHeight)
-                .build();
+    private void setBounds() {
+        monopolyComponent.setBounds(gridX, gridY, gridWidth, gridHeight);
     }
 }
