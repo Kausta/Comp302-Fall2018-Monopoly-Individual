@@ -76,8 +76,8 @@ public class GameView extends NavigationView {
         viewModel.getRedrawPanel().subscribe(x -> {
             if (x == null) {
                 this.populatePlayers();
+                x = viewModel.getCurrentPlayer();
             }
-            x = viewModel.getCurrentPlayer();
             this.populatePlayer(x);
             if (started) {
                 this.drawMenu(x);
@@ -108,6 +108,7 @@ public class GameView extends NavigationView {
         });
         viewModel.getEndTurn().subscribe(unit -> {
             drawMenu(viewModel.getCurrentPlayer());
+            populatePlayer(viewModel.getCurrentPlayer());
         });
     }
 
@@ -288,7 +289,7 @@ public class GameView extends NavigationView {
         }
         JPanel panel = builder.build()
                 .getContent();
-        Color bg = currentPlayer ? player.getBackgroundColor() : player.getPlayerColor();
+        Color bg = currentPlayer ? player.getPlayerColor() : player.getPlayerColor();
         panel.setBackground(bg);
         outer.setBackground(bg);
         outer.setViewportView(panel);
@@ -398,7 +399,7 @@ public class GameView extends NavigationView {
             BufferedImage playerImage = new BufferedImage(PLAYER_SIZE, PLAYER_SIZE, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics = playerImage.createGraphics();
 
-            graphics.setPaint(player.getBackgroundColor());
+            graphics.setPaint(player.getPlayerColor());
             graphics.fillRect(0, 0, playerImage.getWidth(), playerImage.getHeight());
 
             playerBox = new JPanel();
