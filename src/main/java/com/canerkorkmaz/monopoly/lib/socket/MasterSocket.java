@@ -48,7 +48,7 @@ public class MasterSocket extends BaseSocket {
         }
         try {
             Socket client = socket.accept();
-            if (repository.isGameStarted()) {
+            if (this.isGameStarted()) {
                 throw new IOException("Not accepting connections when started, rejected");
             }
             MasterConnectionSocket connectionSocket = new MasterConnectionSocket(DI.get(ILoggerFactory.class), client, getDispatcher());

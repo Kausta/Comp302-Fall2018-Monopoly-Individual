@@ -6,6 +6,7 @@ import com.canerkorkmaz.monopoly.lib.logger.Logger;
 import com.canerkorkmaz.monopoly.view.base.WindowAwareView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.util.Stack;
 
@@ -120,5 +121,9 @@ public class NavigationContainer extends WindowAwareView {
             this.navigatePopUnchecked();
         }
         e.getWindow().dispose();
+    }
+
+    public Dimension getSize() {
+        return window.getBounds().getSize();
     }
 }

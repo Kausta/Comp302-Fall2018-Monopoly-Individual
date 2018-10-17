@@ -8,6 +8,8 @@ import com.canerkorkmaz.monopoly.lib.event.UIEvent;
 import com.canerkorkmaz.monopoly.lib.typing.Unit;
 import com.canerkorkmaz.monopoly.view.data.UINameData;
 
+import java.util.UUID;
+
 public class UserNamesViewModel {
     private final LocalPlayerRepository configuration;
     private final UIEvent<Unit> successfullySetNames;
@@ -34,7 +36,8 @@ public class UserNamesViewModel {
         String[] names = this.configuration.getLocalPlayerNames();
         for (int i = 0; i < names.length; i++) {
             if (names[i] == null) {
-                names[i] = "Player " + i;
+                //names[i] = "Player " + i;
+                names[i] = UUID.randomUUID().toString().substring(0, 6);
             }
         }
         return names;

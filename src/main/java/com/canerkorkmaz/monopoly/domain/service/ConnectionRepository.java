@@ -1,12 +1,12 @@
 package com.canerkorkmaz.monopoly.domain.service;
 
-import com.canerkorkmaz.monopoly.data.model.ConnectionData;
+import com.canerkorkmaz.monopoly.data.data.ConnectionData;
 import com.canerkorkmaz.monopoly.data.socket.SocketConnection;
+import com.canerkorkmaz.monopoly.domain.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.domain.data.ClientData;
 import com.canerkorkmaz.monopoly.domain.data.ServerData;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
-import com.canerkorkmaz.monopoly.lib.command.RemoteCommand;
 import com.canerkorkmaz.monopoly.lib.di.DI;
 import com.canerkorkmaz.monopoly.lib.di.Injected;
 import com.canerkorkmaz.monopoly.lib.logger.ILoggerFactory;
@@ -86,16 +86,17 @@ public class ConnectionRepository {
     }
 
     public void sendRemote(BaseCommand command) {
-        dispatcher.sendCommand(new RemoteCommand(command));
+        dispatcher.sendCommand(command);
     }
 
-    public void receiveLocalOnce(Function<BaseCommand, Boolean> fn) {
+    public void receiveRemoteOnce(Function<BaseCommand, Boolean> fn) {
         dispatcher.subscribeOnce((command) -> {
             logger.d(command.toString());
-            if (command instanceof RemoteCommand) {
+            // We are expecting a command coming from remote connection
+            if (!(command instanceof RemoteCommand)) {
                 return false;
             }
-            return fn.apply(command);
+            return fn.apply(((RemoteCommand) command).getInnerCommand());
         });
     }
 
@@ -104,6 +105,10 @@ public class ConnectionRepository {
     }
 
     public void setGameStarted(boolean gameStarted) {
-        this.gameStarted = gameStarted;
+        this.socket.setClientConnected(gameStarted);
+    }
+
+    public int getOrigin() {
+        return data.getMode() == ConnectionData.Mode.SERVER ? 0 : 1;
     }
 }

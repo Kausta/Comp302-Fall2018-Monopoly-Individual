@@ -6,7 +6,7 @@ public final class Colors {
     /**
      * Application background color
      */
-    public final static Color BACKGROUND_COLOR = new Color(144, 219, 145);
+    public final static Color BACKGROUND_COLOR = new Color(175, 231, 204);
 
     private Colors() {
         throw new AssertionError();

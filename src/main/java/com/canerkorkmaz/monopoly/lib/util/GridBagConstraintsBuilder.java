@@ -47,6 +47,12 @@ public class GridBagConstraintsBuilder {
         return this;
     }
 
+    public GridBagConstraintsBuilder setInsets(int hgap, int vgap) {
+        constraints.insets = new Insets(vgap, hgap, vgap, hgap);
+
+        return this;
+    }
+
     public GridBagConstraints build() {
         return constraints;
     }

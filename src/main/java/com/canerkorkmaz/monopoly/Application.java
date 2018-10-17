@@ -17,13 +17,13 @@ import javax.swing.*;
  */
 public class Application implements Runnable {
     private final Logger logger;
-    private final CommandDispatcher dispatcher;
 
     @Injected
     public Application(ILoggerFactory loggerFactory, CommandDispatcher dispatcher) {
-        this.logger = loggerFactory.createLogger(Application.class);
-        this.dispatcher = dispatcher;
+        // Start command dispatcher
         dispatcher.runDispatcher();
+
+        this.logger = loggerFactory.createLogger(Application.class);
 
         logger.i("Created new Monopoly Application");
     }
