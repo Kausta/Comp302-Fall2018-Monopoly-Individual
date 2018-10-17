@@ -2,6 +2,7 @@ package com.canerkorkmaz.monopoly.viewmodel;
 
 import com.canerkorkmaz.monopoly.data.model.PlayerModel;
 import com.canerkorkmaz.monopoly.domain.command.*;
+import com.canerkorkmaz.monopoly.domain.service.BoardRepository;
 import com.canerkorkmaz.monopoly.domain.service.PlayerRepository;
 import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 import com.canerkorkmaz.monopoly.lib.command.CommandDispatcher;
@@ -20,6 +21,7 @@ public class GameViewModel {
     private final Logger logger;
     private final CommandDispatcher dispatcher;
     private final PlayerRepository playerRepository;
+    private final BoardRepository boardRepository;
     private final UIEvent<Unit> closeApplication;
     private final UIEvent<PlayerModel> redrawPanel;
     private final UIEvent<Boolean> endOrderTurn;
@@ -32,10 +34,11 @@ public class GameViewModel {
     public GameViewModel(ILoggerFactory loggerFactory,
                          CommandDispatcher dispatcher,
                          PlayerRepository playerRepository,
-                         EventFactory eventFactory) {
+                         BoardRepository boardRepository, EventFactory eventFactory) {
         this.logger = loggerFactory.createLogger(GameViewModel.class);
         this.dispatcher = dispatcher;
         this.playerRepository = playerRepository;
+        this.boardRepository = boardRepository;
         this.closeApplication = eventFactory.createUIEvent();
         this.redrawPanel = eventFactory.createUIEvent();
         this.endOrderTurn = eventFactory.createUIEvent();
@@ -78,12 +81,21 @@ public class GameViewModel {
                 RollCommand newRoll = (RollCommand) command;
                 PlayerModel player = getCurrentPlayer();
                 player.setRoll(newRoll.getRoll1(), newRoll.getRoll2());
+                if(player.shouldRollAgain()){
+                    player.setShouldRollAgain(false);
+                } else if(newRoll.getRoll1() == newRoll.getRoll2()) {
+                    player.setShouldRollAgain(true);
+                }
                 playerMove.trigger(player.getRoll());
                 break;
             case EndTurnCommand.IDENTIFIER:
                 getCurrentPlayer().setRoll(0, 0);
                 this.currentPlayerIndex = (((EndTurnCommand) command).getPlayerIndex() + 1) % this.playerRepository.getPlayerCount();
                 endTurn.trigger(Unit.INSTANCE);
+                break;
+            case PassCommand.IDENTIFIER:
+                boardRepository.handleTilePass(getCurrentPlayer(), ((PassCommand) command).getLocation());
+                redrawPanel.trigger(getCurrentPlayer());
                 break;
             default:
                 logger.w("Didn't expect command: " + command.toString());
@@ -132,6 +144,10 @@ public class GameViewModel {
 
     public void dispatchEndTurn() {
         dispatcher.sendCommand(new EndTurnCommand(currentPlayerIndex));
+    }
+
+    public void dispatchHandlePass(int location) {
+        dispatcher.sendCommand(new PassCommand(location));
     }
 
     public UIEvent<PlayerModel> getRedrawPanel() {

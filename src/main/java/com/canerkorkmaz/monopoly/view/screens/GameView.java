@@ -14,7 +14,6 @@ import com.canerkorkmaz.monopoly.viewmodel.GameViewModel;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -192,16 +191,16 @@ public class GameView extends NavigationView {
         monopolyPanel.setLayout(null);
         monopolyPanel.setBackground(Colors.BACKGROUND_COLOR);
         Dimension dim = left.getPreferredSize();
-        monopolyPanel.setBounds(0, 0, (int)dim.getWidth(), (int)dim.getHeight());
+        monopolyPanel.setBounds(0, 0, (int) dim.getWidth(), (int) dim.getHeight());
         double max_size = 2 * GRID_WIDE + 4 * GRID_NARROW;
-        int xOffset = (int)(dim.getWidth() / 2 - max_size / 2);
-        int yOffset = (int)(dim.getHeight() / 2 - max_size / 2);
+        int xOffset = (int) (dim.getWidth() / 2 - max_size / 2);
+        int yOffset = (int) (dim.getHeight() / 2 - max_size / 2);
         int pos = 0;
         int arrayIndex = 0;
         for (int i = 0; i < 6; i++) {
             boolean isCorner = (i % 5) == 0;
             int width = isCorner ? GRID_WIDE : GRID_NARROW;
-            JComponent component = getMonopolySquare(i, 0 , isCorner ? WIDE : NARROW, WIDE);
+            JComponent component = getMonopolySquare(i, 0, isCorner ? WIDE : NARROW, WIDE);
             monopolyPanel.add(component);
             MonopolyBoxHolder holder = new MonopolyBoxHolder(component, xOffset + pos, yOffset, width, GRID_WIDE);
             monopolyBoxes[arrayIndex++] = holder;
@@ -314,20 +313,19 @@ public class GameView extends NavigationView {
 
     private JPanel getMenu(PlayerModel model) {
         boolean isCurrentUser = viewModel.isFromThisClient(model);
-        if (!viewModel.rolledThisTurn(model)) {
-            return new Form.Builder()
-                    .addLabeledText("Turn of: ", model.getPlayerName())
-                    .addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !isAnimating && !viewModel.isRolled(model))
-                    .build()
-                    .getContent();
+        Form.Builder builder = new Form.Builder();
+        if (!viewModel.rolledThisTurn(model) || model.shouldRollAgain()) {
+            builder.addLabeledText("Turn of: ", model.getPlayerName());
+            if(model.shouldRollAgain()) {
+                builder.addLabeledText("You Rolled Double: ",model.getRollString());
+            }
+            builder.addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !isAnimating && !viewModel.isRolled(model));
         } else {
-            return new Form.Builder()
-                    .addLabeledText("Turn of: ", model.getPlayerName())
+            builder.addLabeledText("Turn of: ", model.getPlayerName())
                     .addLabeledText("Rolled: ", model.getRollString())
-                    .addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser && !isAnimating)
-                    .build()
-                    .getContent();
+                    .addButton("END TURN", viewModel::dispatchEndTurn, isCurrentUser && !isAnimating);
         }
+        return builder.build().getContent();
     }
 
     private void drawMenu(PlayerModel model) {
@@ -364,7 +362,7 @@ public class GameView extends NavigationView {
         Point offset = getPosition(playerLocation, player.getOrder());
         JPanel playerBox = playerImages.get(player.getPlayerName());
         if (playerBox == null) {
-            BufferedImage playerImage = new BufferedImage(PLAYER_SIZE,  PLAYER_SIZE, BufferedImage.TYPE_INT_RGB);
+            BufferedImage playerImage = new BufferedImage(PLAYER_SIZE, PLAYER_SIZE, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics = playerImage.createGraphics();
 
             graphics.setPaint(player.getBackgroundColor());
@@ -430,7 +428,6 @@ public class GameView extends NavigationView {
             long elapsed = System.currentTimeMillis() - start;
             animationProgress = (double) elapsed / ANIMATION_TIME;
             Point loc = interpolate(from, to, animationProgress);
-            logger.i("Loc: " + loc);
 
             playerBox.setBounds(loc.x, loc.y, PLAYER_SIZE, PLAYER_SIZE);
             redrawComponent(monopolyPanel);
@@ -439,6 +436,7 @@ public class GameView extends NavigationView {
             if (animationProgress >= 0.97f) {
                 timer.stop();
                 animatePlayerImplementation(playerBox, model, fromLocation + 1, toLocation);
+                viewModel.dispatchHandlePass((fromLocation + 1) % 20);
             }
         });
         timer.start();

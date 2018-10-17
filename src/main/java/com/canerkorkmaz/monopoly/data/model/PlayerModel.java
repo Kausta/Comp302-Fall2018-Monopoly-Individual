@@ -17,6 +17,7 @@ public class PlayerModel {
     private int order = 0;
     private int roll1 = 0;
     private int roll2 = 0;
+    private boolean shouldRollAgain = false;
 
     public PlayerModel(String playerName, double money, Color playerColor, int origin) {
         this.playerName = playerName;
@@ -110,5 +111,12 @@ public class PlayerModel {
     public void setRoll(int x1, int x2) {
         this.roll1 = x1;
         this.roll2 = x2;
+    }
+
+    public boolean shouldRollAgain() {
+        return shouldRollAgain;
+    }
+    public void setShouldRollAgain(boolean value) {
+        this.shouldRollAgain = value;
     }
 }
