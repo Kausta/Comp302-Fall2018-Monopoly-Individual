@@ -20,6 +20,10 @@ public class TileModel implements Serializable {
     }
 
     public void handlePass(PlayerModel model) {
+        // Do nothing by default
+    }
 
+    public void handleLand(PlayerModel model) {
+        // Do nothing by default
     }
 }

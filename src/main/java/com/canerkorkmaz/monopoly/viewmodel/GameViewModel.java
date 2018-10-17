@@ -84,9 +84,9 @@ public class GameViewModel {
                 if(player.shouldRollAgain()){
                     player.setShouldRollAgain(false);
                 } else if(newRoll.getRoll1() == newRoll.getRoll2()) {
-                    player.setShouldRollAgain(true);
+                    player.setShouldRollAgain(true, "You Rolled Double: " + newRoll.getRoll1() + ", " + newRoll.getRoll2());
                 }
-                playerMove.trigger(player.getRoll());
+                playerMove.trigger((player.getNextTurnReverse() ? -1 : 1) * player.getRoll());
                 break;
             case EndTurnCommand.IDENTIFIER:
                 getCurrentPlayer().setRoll(0, 0);
@@ -96,6 +96,16 @@ public class GameViewModel {
             case PassCommand.IDENTIFIER:
                 boardRepository.handleTilePass(getCurrentPlayer(), ((PassCommand) command).getLocation());
                 redrawPanel.trigger(getCurrentPlayer());
+                break;
+            case EndMovementCommand.IDENTIFIER:
+                PlayerModel currentPlayer = getCurrentPlayer();
+                // Reset some of the state
+                if(currentPlayer.getNextTurnReverse()) {
+                    currentPlayer.setNextTurnReverse(false);
+                }
+
+                boardRepository.handleTileLand(currentPlayer, currentPlayer.getLocation());
+                redrawPanel.trigger(currentPlayer);
                 break;
             default:
                 logger.w("Didn't expect command: " + command.toString());
@@ -147,7 +157,12 @@ public class GameViewModel {
     }
 
     public void dispatchHandlePass(int location) {
-        dispatcher.sendCommand(new PassCommand(location));
+        // Remote command so that we don't accidentally send local event
+        dispatcher.sendCommand(new RemoteCommand(new PassCommand(location)));
+    }
+
+    public void dispatchEndMovement() {
+        dispatcher.sendCommand(new RemoteCommand(new EndMovementCommand()));
     }
 
     public UIEvent<PlayerModel> getRedrawPanel() {

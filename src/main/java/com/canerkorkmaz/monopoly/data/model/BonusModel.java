@@ -14,6 +14,12 @@ public class BonusModel extends TileModel {
         model.setMoney(model.getMoney() + moneyGain);
     }
 
+    @Override
+    public void handleLand(PlayerModel model) {
+        this.handlePass(model);
+        model.setMoney(model.getMoney() + extraGain);
+    }
+
     public double getMoneyGain() {
         return moneyGain;
     }

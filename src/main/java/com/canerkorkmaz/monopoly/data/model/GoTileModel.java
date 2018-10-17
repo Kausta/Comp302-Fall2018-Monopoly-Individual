@@ -15,6 +15,11 @@ public class GoTileModel extends TileModel {
         model.setMoney(model.getMoney() + getMoneyGain());
     }
 
+    @Override
+    public void handleLand(PlayerModel model) {
+        this.handlePass(model);
+    }
+
     public double getMoneyGain() {
         return moneyGain;
     }

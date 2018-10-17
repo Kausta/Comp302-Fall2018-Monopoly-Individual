@@ -18,6 +18,8 @@ public class PlayerModel {
     private int roll1 = 0;
     private int roll2 = 0;
     private boolean shouldRollAgain = false;
+    private String rollAgainMessage = null;
+    private boolean nextTurnReverse = false;
 
     public PlayerModel(String playerName, double money, Color playerColor, int origin) {
         this.playerName = playerName;
@@ -117,6 +119,23 @@ public class PlayerModel {
         return shouldRollAgain;
     }
     public void setShouldRollAgain(boolean value) {
+        this.rollAgainMessage = null;
         this.shouldRollAgain = value;
+    }
+    public void setShouldRollAgain(boolean value, String message) {
+        this.rollAgainMessage = message;
+        this.shouldRollAgain = value;
+    }
+
+    public boolean getNextTurnReverse() {
+        return this.nextTurnReverse;
+    }
+
+    public void setNextTurnReverse(boolean nextTurnReverse) {
+        this.nextTurnReverse = nextTurnReverse;
+    }
+
+    public String getRollAgainMessage() {
+        return rollAgainMessage;
     }
 }

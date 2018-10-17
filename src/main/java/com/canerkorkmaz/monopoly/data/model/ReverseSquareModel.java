@@ -6,4 +6,9 @@ public class ReverseSquareModel extends TileModel {
     public ReverseSquareModel() {
         super(TileType.REVERSE_DIRECTION);
     }
+
+    @Override
+    public void handleLand(PlayerModel model) {
+        model.setNextTurnReverse(true);
+    }
 }

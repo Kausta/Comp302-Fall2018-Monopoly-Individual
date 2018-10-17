@@ -6,4 +6,9 @@ public class KocSquareModel extends TileModel {
     public KocSquareModel() {
         super(TileType.KOC_SQUARE);
     }
+
+    @Override
+    public void handleLand(PlayerModel model) {
+        model.setShouldRollAgain(true, "You landed on Koc Square with " + model.getRollString() + ", re-roll");
+    }
 }

@@ -35,6 +35,7 @@ public class GameView extends NavigationView {
 
     private double animationProgress = 0.0;
     private boolean isAnimating = false;
+    private boolean started = false;
 
     private JPanel overlayPane;
     private JPanel rootPane;
@@ -70,9 +71,17 @@ public class GameView extends NavigationView {
     private void bindEvents() {
         viewModel.getCloseApplication().subscribe(unit ->
                 this.getNavigator().exitApplication());
-        viewModel.getRedrawPanel().subscribe(this::populatePlayer);
+        viewModel.getRedrawPanel().subscribe(x -> {
+                this.populatePlayer(x);
+                if(started) {
+                    this.drawMenu(x);
+                } else {
+                    this.drawOrderRollMenu(x);
+                }
+        });
         viewModel.getEndOrderTurn().subscribe(finished -> {
             if (finished) {
+                started = true;
                 populatePlayers();
                 drawPlayers(viewModel.getPlayers());
                 drawMenu(viewModel.getCurrentPlayer());
@@ -88,7 +97,7 @@ public class GameView extends NavigationView {
             model.setLocation(newLocation);
             drawMenu(model);
             populatePlayer(model);
-            animatePlayer(model, location, newLocation);
+            animatePlayer(model, location, newLocation, model.getNextTurnReverse());
         });
         viewModel.getEndTurn().subscribe(unit -> {
             drawMenu(viewModel.getCurrentPlayer());
@@ -317,7 +326,10 @@ public class GameView extends NavigationView {
         if (!viewModel.rolledThisTurn(model) || model.shouldRollAgain()) {
             builder.addLabeledText("Turn of: ", model.getPlayerName());
             if(model.shouldRollAgain()) {
-                builder.addLabeledText("You Rolled Double: ",model.getRollString());
+                builder.addLabeledText("Roll: ", model.getRollAgainMessage());
+            }
+            if(model.getNextTurnReverse()) {
+                builder.addLabeledText("You are going reverse this turn", ":(");
             }
             builder.addButton("ROLL", viewModel::dispatchRoll, isCurrentUser && !isAnimating && !viewModel.isRolled(model));
         } else {
@@ -402,26 +414,33 @@ public class GameView extends NavigationView {
         return new Point(x + xOffset, y + yOffset);
     }
 
-    private void animatePlayer(PlayerModel model, int fromLocation, int toLocation) {
+    private void animatePlayer(PlayerModel model, int fromLocation, int toLocation, boolean isReverse) {
         JPanel playerBox = playerImages.get(model.getPlayerName());
-        if (toLocation < fromLocation) {
+        if (!isReverse && toLocation < fromLocation) {
             toLocation += 20;
+        } else if(isReverse && toLocation > fromLocation) {
+            toLocation -= 20;
         }
         isAnimating = true;
         drawMenu(model);
-        animatePlayerImplementation(playerBox, model, fromLocation, toLocation);
+        animatePlayerImplementation(playerBox, 0, model, fromLocation, toLocation, isReverse);
     }
 
-    private void animatePlayerImplementation(final JPanel playerBox, PlayerModel model, int fromLocation, int toLocation) {
-        if (fromLocation >= toLocation) {
+    private void animatePlayerImplementation(final JPanel playerBox, int animationIndex, PlayerModel model, int fromLocation, int toLocation, boolean isReverse) {
+        if ((!isReverse && fromLocation >= toLocation) || (isReverse && fromLocation <= toLocation)) {
             isAnimating = false;
             drawMenu(model);
             drawPlayer(model);
+            viewModel.dispatchEndMovement();
             return;
         }
+        if(animationIndex != 0) {
+            viewModel.dispatchHandlePass(fromLocation % 20);
+        }
+        final int nextLocation = (fromLocation + (isReverse ? -1 : 1) + 20) % 20;
         final long start = System.currentTimeMillis();
-        final Point from = getPosition(fromLocation % 20, model.getOrder());
-        final Point to = getPosition((fromLocation + 1) % 20, model.getOrder());
+        final Point from = getPosition((fromLocation + 20) % 20, model.getOrder());
+        final Point to = getPosition(nextLocation, model.getOrder());
         final Timer timer = new Timer(16, null);
         animationProgress = 0.0;
         timer.addActionListener((event) -> {
@@ -435,8 +454,7 @@ public class GameView extends NavigationView {
             monopolyPanel.setComponentZOrder(playerBox, 0);
             if (animationProgress >= 0.97f) {
                 timer.stop();
-                animatePlayerImplementation(playerBox, model, fromLocation + 1, toLocation);
-                viewModel.dispatchHandlePass((fromLocation + 1) % 20);
+                animatePlayerImplementation(playerBox, animationIndex + 1, model, fromLocation + (isReverse ? -1 : 1), toLocation, isReverse);
             }
         });
         timer.start();

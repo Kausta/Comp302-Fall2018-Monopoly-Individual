@@ -30,7 +30,7 @@ public class MonopolyImageLoader {
         } else if (y == 5) {
             return 15 - x;
         } else if (x == 0) {
-            return 20 - y;
+            return 15 + y;
         } else if (x == 5) {
             return 5 + y;
         } else {

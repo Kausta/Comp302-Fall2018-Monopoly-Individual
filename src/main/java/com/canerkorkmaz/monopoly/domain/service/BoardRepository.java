@@ -44,4 +44,9 @@ public class BoardRepository {
         TileModel tile = getBoardTile(location);
         tile.handlePass(model);
     }
+
+    public void handleTileLand(PlayerModel model, int location) {
+        TileModel tile = getBoardTile(location);
+        tile.handleLand(model);
+    }
 }
