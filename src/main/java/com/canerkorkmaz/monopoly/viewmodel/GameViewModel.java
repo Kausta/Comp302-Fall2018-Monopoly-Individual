@@ -83,10 +83,12 @@ public class GameViewModel {
                 RollCommand newRoll = (RollCommand) command;
                 PlayerModel player = getCurrentPlayer();
                 player.setRoll(newRoll.getRoll1(), newRoll.getRoll2());
-                if(player.shouldRollAgain()){
-                    player.setShouldRollAgain(false);
-                } else if(newRoll.getRoll1() == newRoll.getRoll2()) {
+                player.setCanBuyProperty(false);
+                player.setBuyableProperty(null);
+                if(newRoll.getRoll1() == newRoll.getRoll2()) {
                     player.setShouldRollAgain(true, "You Rolled Double: " + newRoll.getRoll1() + ", " + newRoll.getRoll2());
+                } else {
+                	player.setShouldRollAgain(false);
                 }
                 playerMove.trigger((player.getNextTurnReverse() ? -1 : 1) * player.getRoll());
                 break;
@@ -97,6 +99,7 @@ public class GameViewModel {
                 currentPlayer.setCanBuyProperty(false);
                 currentPlayer.setBuyableProperty(null);
                 this.currentPlayerIndex = (((EndTurnCommand) command).getPlayerIndex() + 1) % this.playerRepository.getPlayerCount();
+                redrawPanel.trigger(currentPlayer);
                 endTurn.trigger(Unit.INSTANCE);
                 break;
             case PassCommand.IDENTIFIER:
