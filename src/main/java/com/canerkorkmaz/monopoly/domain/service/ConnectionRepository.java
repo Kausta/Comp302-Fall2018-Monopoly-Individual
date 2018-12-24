@@ -22,7 +22,7 @@ public class ConnectionRepository {
     private final ConnectionData data;
     private final SocketConnection socket;
     private final CommandDispatcher dispatcher;
-    private boolean gameStarted = false;
+    private final boolean gameStarted = false;
 
     @Injected
     public ConnectionRepository(ILoggerFactory logger, ConnectionData data, SocketConnection socket, CommandDispatcher dispatcher) {

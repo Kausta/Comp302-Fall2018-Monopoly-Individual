@@ -16,9 +16,9 @@ import java.util.Stack;
  * Works based on pushing/popping to the stack or replacing the entire stack
  */
 public class NavigationContainer extends WindowAwareView {
-    private Logger logger = DI.get(ILoggerFactory.class).createLogger(NavigationContainer.class);
+    private final Logger logger = DI.get(ILoggerFactory.class).createLogger(NavigationContainer.class);
 
-    private Stack<NavigationView> navigationStack = new Stack<>();
+    private final Stack<NavigationView> navigationStack = new Stack<>();
     private JFrame window = new JFrame();
 
     public NavigationContainer(Class<? extends NavigationView> initialViewClazz) {

@@ -29,6 +29,7 @@ public class LocalPlayerRepository {
             int minSize = Math.min(previous, localPlayerCount);
             if (minSize >= 0) System.arraycopy(oldNames, 0, newNames, 0, minSize);
         }
+        logger.i("Set player count and copied names");
         this.localPlayerData.setLocalPlayerNames(newNames);
     }
 
@@ -42,5 +43,6 @@ public class LocalPlayerRepository {
             throw new RuntimeException("Problem, configuration is out of sync");
         }
         System.arraycopy(names, 0, configurationNames, 0, configurationNames.length);
+        this.localPlayerData.setLocalPlayerNames(configurationNames);
     }
 }

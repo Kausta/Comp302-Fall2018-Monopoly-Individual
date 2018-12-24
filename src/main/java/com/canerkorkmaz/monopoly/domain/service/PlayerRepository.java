@@ -10,7 +10,6 @@ import com.canerkorkmaz.monopoly.lib.logger.Logger;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -105,11 +104,11 @@ public class PlayerRepository {
 
     public void transerMoneyFromEveryone(PlayerModel model, int money) {
         final Map<String, PlayerModel> playerList = playerData.getPlayerList();
-        for(String playerName: playerList.keySet()) {
-            if(playerName.equals(model.getPlayerName())) {
+        for(Map.Entry<String, PlayerModel> player: playerList.entrySet()) {
+            if(player.getKey().equals(model.getPlayerName())) {
                 continue;
             }
-            PlayerModel other = playerList.get(playerName);
+            PlayerModel other = player.getValue();
             other.setMoney(other.getMoney() - money);
             model.setMoney(model.getMoney() + money);
         }

@@ -32,7 +32,7 @@ public class ConnectionData {
         this.port = port;
     }
 
-    public static enum Mode {
+    public enum Mode {
         SERVER,
         CLIENT
     }

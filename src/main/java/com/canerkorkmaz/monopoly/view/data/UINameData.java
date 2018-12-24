@@ -4,10 +4,10 @@ public class UINameData {
     private final String[] names;
 
     public UINameData(String[] names) {
-        this.names = names;
+        this.names = names.clone();
     }
 
     public String[] getNames() {
-        return names;
+        return names.clone();
     }
 }

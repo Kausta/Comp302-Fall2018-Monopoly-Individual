@@ -17,7 +17,7 @@ public class BoardRepository {
     }
 
     public TileModel getBoardTile(int location) {
-        return data.getTileModels()[location];
+        return data.getTileModels().get(location);
     }
 
     public TileType getTileType(int location) {

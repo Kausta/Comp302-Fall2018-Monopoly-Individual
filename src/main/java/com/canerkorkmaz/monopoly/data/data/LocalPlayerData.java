@@ -16,10 +16,10 @@ public class LocalPlayerData {
     }
 
     public String[] getLocalPlayerNames() {
-        return this.localPlayerNames;
+        return this.localPlayerNames == null ? null : this.localPlayerNames.clone();
     }
 
     public void setLocalPlayerNames(String[] localPlayerNames) {
-        this.localPlayerNames = localPlayerNames;
+        this.localPlayerNames = localPlayerNames.clone();
     }
 }

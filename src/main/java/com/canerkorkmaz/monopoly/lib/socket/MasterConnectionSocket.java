@@ -14,7 +14,7 @@ public class MasterConnectionSocket extends BaseSocket {
     private final Logger logger;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    private Socket socket;
+    private final Socket socket;
 
     public MasterConnectionSocket(ILoggerFactory loggerFactory, Socket socket, CommandDispatcher dispatcher) {
         super("Master-Connection", dispatcher);

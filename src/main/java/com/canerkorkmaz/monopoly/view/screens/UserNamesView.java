@@ -11,7 +11,7 @@ import com.canerkorkmaz.monopoly.viewmodel.UserNamesViewModel;
 import javax.swing.*;
 
 public class UserNamesView extends CenteredNavigationView {
-    private UserNamesViewModel viewModel;
+    private final UserNamesViewModel viewModel;
 
     private JTextField[] nameFields;
 

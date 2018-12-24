@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class RollOnceModel extends TileModel {
     private static final long serialVersionUID = 1L;
-    private static volatile Random r = new Random();
+    private static final Random r = new Random();
 
     public RollOnceModel() {
         super(TileType.ROLL_ONCE);

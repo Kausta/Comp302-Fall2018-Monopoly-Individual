@@ -1,9 +1,6 @@
 package com.canerkorkmaz.monopoly.view.components;
 
-import com.canerkorkmaz.monopoly.lib.util.GridBagConstraintsBuilder;
-
 import javax.swing.*;
-import java.awt.*;
 
 public class MonopolyBoxHolder {
     private final JComponent monopolyComponent;

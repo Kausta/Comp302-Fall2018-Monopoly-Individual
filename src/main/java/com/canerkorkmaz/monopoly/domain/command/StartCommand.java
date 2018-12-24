@@ -7,6 +7,7 @@ import java.util.List;
 
 public class StartCommand extends BaseCommand {
     public static final String IDENTIFIER = "START";
+    private static final long serialVersionUID = 2741681379941638448L;
     private final List<InitialPlayerData> startData;
 
     public StartCommand(List<InitialPlayerData> startData) {

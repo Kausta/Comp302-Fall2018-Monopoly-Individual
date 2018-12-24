@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class Form implements ActionListener {
-    private Logger logger = DI.get(ILoggerFactory.class).createLogger(Form.class);
-    private HashMap<String, Runnable> onClicks;
-    private JPanel root;
+    private final Logger logger = DI.get(ILoggerFactory.class).createLogger(Form.class);
+    private final HashMap<String, Runnable> onClicks;
+    private final JPanel root;
 
     private Form() {
         root = new JPanel();
@@ -45,9 +45,9 @@ public class Form implements ActionListener {
     }
 
     public static class Builder {
-        private List<Component> components = new ArrayList<>();
+        private final List<Component> components = new ArrayList<>();
         private Color backgroundColor;
-        private Form form;
+        private final Form form;
 
         public Builder() {
             form = new Form();

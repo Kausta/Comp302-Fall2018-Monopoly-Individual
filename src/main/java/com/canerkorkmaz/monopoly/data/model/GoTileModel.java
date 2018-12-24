@@ -1,10 +1,8 @@
 package com.canerkorkmaz.monopoly.data.model;
 
-import java.io.Serializable;
-
 public class GoTileModel extends TileModel {
     private static final long serialVersionUID = 1L;
-    private final double moneyGain = 200;
+    private static final double moneyGain = 200;
 
     public GoTileModel() {
         super(TileType.GO_TILE);

@@ -4,6 +4,7 @@ import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 
 public class RollCommand extends BaseCommand {
     public static final String IDENTIFIER = "ROLL_COMMAND";
+    private static final long serialVersionUID = -5611033469813762659L;
 
     private final String playerName;
     private final int roll1;

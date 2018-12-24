@@ -4,6 +4,7 @@ import com.canerkorkmaz.monopoly.lib.command.BaseCommand;
 
 public class EndTurnCommand extends BaseCommand {
     public static final String IDENTIFIER = "END_TURN_COMMAND";
+    private static final long serialVersionUID = -6809116315989126894L;
 
     private final int playerIndex;
 

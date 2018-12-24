@@ -15,9 +15,9 @@ import java.util.function.Function;
 
 public class CommandDispatcher {
     private final Logger logger;
-    private LinkedList<Function<BaseCommand, Boolean>> commandFns = new LinkedList<>();
-    private BlockingQueue<BaseCommand> commands = new ArrayBlockingQueue<>(1024);
-    private IThreadScheduler scheduler = new NamedThreadScheduler("Command-Dispatcher");
+    private final LinkedList<Function<BaseCommand, Boolean>> commandFns = new LinkedList<>();
+    private final BlockingQueue<BaseCommand> commands = new ArrayBlockingQueue<>(1024);
+    private final IThreadScheduler scheduler = new NamedThreadScheduler("Command-Dispatcher");
 
     @Injected
     public CommandDispatcher(ILoggerFactory logger) {

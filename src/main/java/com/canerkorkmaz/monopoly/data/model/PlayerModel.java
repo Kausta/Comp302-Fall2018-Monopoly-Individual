@@ -27,7 +27,7 @@ public class PlayerModel implements Serializable {
     private boolean shouldSqueeze = false;
     private boolean shouldRollOnce = false;
     private int rollOnceRoll = 0;
-    private List<PropertyTileModel> tiles = new ArrayList<>();
+    private final List<PropertyTileModel> tiles = new ArrayList<>();
     private boolean canBuyProperty = false;
     private PropertyTileModel buyableProperty = null;
     private String message = null;

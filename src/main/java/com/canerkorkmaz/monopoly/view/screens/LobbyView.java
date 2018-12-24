@@ -15,8 +15,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class LobbyView extends CenteredNavigationView {
-    private Logger logger;
-    private LobbyViewModel viewModel;
+    private final Logger logger;
+    private final LobbyViewModel viewModel;
 
     @Injected
     public LobbyView(ILoggerFactory loggerFactory, LobbyViewModel viewModel) {

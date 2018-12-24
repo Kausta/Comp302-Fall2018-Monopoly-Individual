@@ -8,7 +8,7 @@ import com.canerkorkmaz.monopoly.view.components.TitleLabel;
 import com.canerkorkmaz.monopoly.view.navigation.CenteredNavigationView;
 
 public class SplashView extends CenteredNavigationView {
-    private Logger logger = DI.get(ILoggerFactory.class).createLogger(SplashView.class);
+    private final Logger logger = DI.get(ILoggerFactory.class).createLogger(SplashView.class);
 
     @Override
     public void onEnter() {

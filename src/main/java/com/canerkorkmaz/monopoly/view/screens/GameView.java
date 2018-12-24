@@ -13,6 +13,7 @@ import com.canerkorkmaz.monopoly.view.navigation.NavigationView;
 import com.canerkorkmaz.monopoly.view.resources.MonopolyImageLoader;
 import com.canerkorkmaz.monopoly.viewmodel.GameViewModel;
 
+import javax.naming.OperationNotSupportedException;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
@@ -243,7 +244,7 @@ public class GameView extends NavigationView {
         JPanel middle = new JPanel();
         middle.setBackground(Colors.BACKGROUND_COLOR);
         monopolyPanel.add(middle);
-        MonopolyBoxHolder middleBox = new MonopolyBoxHolder(middle, xOffset + GRID_WIDE, yOffset + GRID_WIDE, GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + 4 * GRID_NARROW);
+        new MonopolyBoxHolder(middle, xOffset + GRID_WIDE, yOffset + GRID_WIDE, GRID_WIDE + 4 * GRID_NARROW, GRID_WIDE + 4 * GRID_NARROW);
         return monopolyPanel;
     }
 
@@ -289,7 +290,7 @@ public class GameView extends NavigationView {
         }
         JPanel panel = builder.build()
                 .getContent();
-        Color bg = currentPlayer ? player.getPlayerColor() : player.getPlayerColor();
+        Color bg = player.getPlayerColor();
         panel.setBackground(bg);
         outer.setBackground(bg);
         outer.setViewportView(panel);
@@ -419,13 +420,16 @@ public class GameView extends NavigationView {
     }
 
     private Point getPosition(int location, int order) {
+        if(location < 0) {
+            throw new RuntimeException("Location cannot be negative");
+        }
         MonopolyBoxHolder panel = monopolyBoxes[location];
         int x = panel.getGridX();
         int y = panel.getGridY();
 
         int xOffset;
         int yOffset;
-        if ((location >= 0 && location <= 5) || (location >= 10 && location <= 15)) {
+        if (location <= 5 || location >= 10 && location <= 15) {
             xOffset = GAP + (order / 4) * (PLAYER_SIZE + GAP);
             yOffset = GAP + (order % 4) * (PLAYER_SIZE + GAP);
         } else {

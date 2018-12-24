@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class NamedThreadScheduler implements IThreadScheduler {
-    private ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
 
     public NamedThreadScheduler(String name) {
         this(1, name);

@@ -8,7 +8,7 @@ import java.time.Instant;
  * Logger with time, thread name, class name and level
  */
 public class ClassNameLogger extends Logger {
-    private String name;
+    private final String name;
 
     public ClassNameLogger(Class<?> clazz) {
         this.name = clazz.getSimpleName();

@@ -10,8 +10,8 @@ import java.util.Optional;
 public final class DI {
     private static volatile DI instance = null;
     private Logger logger = new DefaultLoggerFactory().createLogger(DI.class);
-    private HashMap<String, Class<?>> registry = new HashMap<>();
-    private HashMap<String, Optional<?>> singletons = new HashMap<>();
+    private final HashMap<String, Class<?>> registry = new HashMap<>();
+    private final HashMap<String, Optional<?>> singletons = new HashMap<>();
 
     private DI() {
 

@@ -6,7 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class Event<T> extends Observable {
-    private IThreadScheduler scheduler;
+    private final IThreadScheduler scheduler;
 
     public Event(IThreadScheduler scheduler) {
         this.scheduler = scheduler;
@@ -20,9 +20,7 @@ public class Event<T> extends Observable {
 
     @SuppressWarnings("unchecked")
     public void subscribe(EventInterface<T> fn) {
-        addObserver((o, arg) -> {
-            scheduler.scheduleOnce(() -> fn.handle((T) arg));
-        });
+        addObserver((o, arg) -> scheduler.scheduleOnce(() -> fn.handle((T) arg)));
     }
 
     @SuppressWarnings("unchecked")

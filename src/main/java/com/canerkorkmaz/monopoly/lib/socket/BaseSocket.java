@@ -6,7 +6,7 @@ import com.canerkorkmaz.monopoly.lib.threading.NamedThreadScheduler;
 
 public abstract class BaseSocket {
     private final NamedThreadScheduler scheduler;
-    private CommandDispatcher dispatcher;
+    private final CommandDispatcher dispatcher;
     private boolean gameStarted = false;
 
     @Injected

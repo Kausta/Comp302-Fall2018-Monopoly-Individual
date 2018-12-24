@@ -12,7 +12,7 @@ import com.canerkorkmaz.monopoly.viewmodel.UserCountViewModel;
 import javax.swing.*;
 
 public class UserCountView extends CenteredNavigationView {
-    private UserCountViewModel viewModel;
+    private final UserCountViewModel viewModel;
 
     private JComboBox<Integer> playerCountField;
 
@@ -51,7 +51,6 @@ public class UserCountView extends CenteredNavigationView {
             viewModel.getOnContinueClick().trigger(new UICountData(playerCount));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Invalid player count");
-            return;
         }
     }
 }

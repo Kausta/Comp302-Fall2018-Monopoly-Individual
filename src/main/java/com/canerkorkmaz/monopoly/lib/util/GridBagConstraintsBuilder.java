@@ -3,7 +3,7 @@ package com.canerkorkmaz.monopoly.lib.util;
 import java.awt.*;
 
 public class GridBagConstraintsBuilder {
-    private GridBagConstraints constraints;
+    private final GridBagConstraints constraints;
 
     public GridBagConstraintsBuilder() {
         constraints = new GridBagConstraints();

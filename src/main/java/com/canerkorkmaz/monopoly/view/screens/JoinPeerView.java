@@ -17,8 +17,8 @@ public class JoinPeerView extends CenteredNavigationView {
     private final Logger logger;
     private final JoinPeerViewModel viewModel;
 
-    private JTextField ipField = new JTextField("127.0.0.1");
-    private JTextField peerPortField = new JTextField("3000");
+    private final JTextField ipField = new JTextField("127.0.0.1");
+    private final JTextField peerPortField = new JTextField("3000");
     private JTextField portField = new JTextField("");
 
     @Injected

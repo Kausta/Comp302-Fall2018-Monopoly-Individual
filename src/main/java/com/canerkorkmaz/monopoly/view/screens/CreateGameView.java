@@ -14,8 +14,8 @@ import com.canerkorkmaz.monopoly.viewmodel.CreateGameViewModel;
 import javax.swing.*;
 
 public class CreateGameView extends CenteredNavigationView {
-    private Logger logger;
-    private CreateGameViewModel viewModel;
+    private final Logger logger;
+    private final CreateGameViewModel viewModel;
 
     private JTextField portField;
 

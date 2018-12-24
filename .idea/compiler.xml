@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.form" />
+      <entry name="!?*.class" />
+      <entry name="!?*.groovy" />
+      <entry name="!?*.scala" />
+      <entry name="!?*.flex" />
+      <entry name="!?*.kt" />
+      <entry name="!?*.clj" />
+      <entry name="!?*.aj" />
+      <entry name="!?*.png" />
+    </wildcardResourcePatterns>
+  </component>
+  <component name="HaskellBuildOptions">
+    <ghcPath>D:\lib\HaskellPlatform\8.4.3\bin\ghc.exe</ghcPath>
+    <cabalPath>D:\lib\HaskellPlatform\8.4.3\lib\extralibs\bin\cabal.exe</cabalPath>
+    <stackPath>D:\lib\HaskellStack\bin\stack.exe</stackPath>
+  </component>
+</project>
